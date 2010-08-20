@@ -47,7 +47,7 @@ public final class ByteOrder {
      * This is the only thing that ByteOrder is really used for: to know whether we need to swap
      * bytes to get this order, given bytes in native order. (That is, this is the opposite of
      * the hypothetical "isNativeOrder".)
-     * @hide - needed in libcore.io too.
+     * @hide internal use only
      */
     public final boolean needsSwap;
 
