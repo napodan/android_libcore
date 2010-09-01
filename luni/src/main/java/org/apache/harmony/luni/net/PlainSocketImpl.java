@@ -161,12 +161,10 @@ public class PlainSocketImpl extends SocketImpl {
     }
 
     @Override
-    protected void close() throws IOException {
-        synchronized (fd) {
-            if (fd.valid()) {
-                Platform.NETWORK.close(fd);
-                fd = new FileDescriptor();
-            }
+    protected synchronized void close() throws IOException {
+        if (fd.valid()) {
+            Platform.NETWORK.close(fd);
+            fd = new FileDescriptor();
         }
     }
 
@@ -442,10 +440,6 @@ public class PlainSocketImpl extends SocketImpl {
     @Override
     protected void sendUrgentData(int value) throws IOException {
         Platform.NETWORK.sendUrgentData(fd, (byte) value);
-    }
-
-    FileDescriptor getFD() {
-        return fd;
     }
 
     int read(byte[] buffer, int offset, int count) throws IOException {
