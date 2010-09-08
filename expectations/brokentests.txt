@@ -3,6 +3,50 @@
  */
 [
 {
+  description: "libcore.java.io.OldFileTest#test_deleteOnExit fails on IRM05 mysid-user",
+  name: "libcore.java.io.OldFileTest#test_deleteOnExit",
+  bug: 5834665
+},
+{
+  description: "FIONREAD/SIOCINQ returns the wrong result on sockets (5731252 is the root cause of 5534202)",
+  name: "libcore.java.net.SocketTest#testAvailable",
+  bug: 5731252
+},
+{
+  description: "libcore.java.net.URLConnectionTest#testServerShutdownInput fails on ICL27 mysid-userdebug (5534202 is caused by 5731252)",
+  name: "libcore.java.net.URLConnectionTest#testServerShutdownInput",
+  bug: 5534202
+},
+{
+  description: "Support digest authentication in HttpURLConnection",
+  name: "libcore.net.http.ParsedHeadersTest#testParseChallengesWithManyParameters",
+  bug: 6156454
+},
+{
+  description: "Without no security manager, we don't care if checkPermission's argument is null",
+  name: "org.apache.harmony.security.tests.java.security.AccessController2Test#test_checkPermission_NullParameter",
+  result: EXEC_FAILED
+},
+{
+  description: "This test and testGetKeepAlive have been failing in our continuous build recently.",
+  names: [
+    "libcore.java.net.URLConnectionTest#testConnectTimeouts",
+    "libcore.java.net.URLConnectionTest#testGetKeepAlive"
+  ],
+  bug: 3441111
+},
+{
+  description: "on the RI, writing the two halves of the surrogate pair in separate writes
+          is an error because the CharsetEncoder doesn't remember it's half-way through a
+          surrogate pair across the two calls!",
+  result: EXEC_FAILED,
+  names: [
+    "libcore.java.nio.charset.CharsetEncoderTest#testCharsetEncoderSurrogatesBrokenByDesign_IGNORE_RI",
+    "libcore.java.nio.charset.CharsetEncoderTest#testCharsetEncoderSurrogatesBrokenByDesign_REPLACE_RI",
+    "libcore.java.nio.charset.CharsetEncoderTest#testCharsetEncoderSurrogatesBrokenByDesign_REPORT_RI"
+  ]
+},
+{
   description: "We're retiring the security manager. Unfortunately, tests all over the place
                 need to check that they're secure, so they all fail when we refuse to install
                 a security manager. This suppresses all of these failures.",
@@ -839,50 +883,6 @@
     "org.apache.harmony.luni.tests.java.util.FormatterTest#test_formatLjava_lang_String$Ljava_lang_Object_Width"
   ],
   substring: "java.util.IllegalFormatFlagsException: %% doesn't take an argument"
-},
-{
-  description: "These tests expect to be able to load resources from the file system",
-  result: EXEC_FAILED,
-  names: [
-    "org.apache.harmony.luni.tests.java.lang.ClassTest#test_getResourceAsStreamLjava_lang_String",
-    "org.apache.harmony.luni.tests.java.lang.ClassTest#test_getResourceAsStream_withSharpChar",
-    "org.apache.harmony.luni.tests.java.lang.ClassTest#test_getResourceLjava_lang_String"
-  ]
-},
-{
-  names: [
-    "org.apache.harmony.luni.tests.java.io.FileTest#test_equalsLjava_lang_Object",
-    "tests.api.java.io.FileTest#test_equalsLjava_lang_Object"
-  ],
-  result: EXEC_FAILED,
-  substring: "File system is case insensitive"
-},
-{
-  description: "We don't special case as much for new File(emptyString, emptyString)",
-  name: "org.apache.harmony.luni.tests.java.io.FileTest#test_getPath",
-  result: EXEC_FAILED,
-  substring: "expected:</> but was:<>"
-},
-{
-  description: "Can't test read-only when running as root!",
-  names: [
-    "org.apache.harmony.luni.tests.java.io.FileTest#test_setReadOnly",
-    "tests.api.java.io.FileTest#test_setReadOnly"
-  ],
-  result: EXEC_FAILED
-},
-{
-  description: "These tests want to load class files on a dalvikvm",
-  names: [
-    "org.apache.harmony.luni.tests.java.lang.ClassLoaderTest#test_defineClass_defaultDomain",
-    "org.apache.harmony.luni.tests.java.lang.ClassLoaderTest#test_getResourceAsStreamLjava_lang_String",
-    "org.apache.harmony.luni.tests.java.lang.ClassLoaderTest#test_getResourceAsStream_withSharpChar",
-    "org.apache.harmony.luni.tests.java.lang.ClassLoaderTest#test_getResourceLjava_lang_String",
-    "org.apache.harmony.luni.tests.java.lang.ClassLoaderTest#test_getSystemClassLoader",
-    "org.apache.harmony.luni.tests.java.lang.ClassLoaderTest#test_getSystemResourceLjava_lang_String",
-    "org.apache.harmony.luni.tests.java.lang.ClassLoaderTest#test_loadClass_concurrentLoad"
-  ],
-  result: EXEC_FAILED
 },
 {
   description: "Some tests (ExcludedProxyTest) connect to a public webserver to check that the HTTP client works",
