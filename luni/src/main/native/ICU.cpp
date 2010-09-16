@@ -568,5 +568,13 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(ICU, toUpperCase, "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"),
 };
 void register_libcore_icu_ICU(JNIEnv* env) {
+    // Failures to find the ICU data tend to be somewhat obscure because ICU loads its data on first
+    // use, which can be anywhere. Force initialization up front so we can report a nice clear error
+    // and bail.
+    UErrorCode status = U_ZERO_ERROR;
+    u_init(&status);
+    if (status != U_ZERO_ERROR) {
+        ALOGE("Couldn't initialize ICU: %s", u_errorName(status));
+    }
     jniRegisterNativeMethods(env, "libcore/icu/ICU", gMethods, NELEM(gMethods));
 }
