@@ -24,7 +24,7 @@ import java.io.PushbackInputStream;
 import java.nio.charset.ModifiedUtf8;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
-import libcore.base.Streams;
+import libcore.io.Streams;
 
 /**
  * This class provides an implementation of {@code FilterInputStream} that

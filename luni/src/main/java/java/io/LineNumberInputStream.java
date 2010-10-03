@@ -17,7 +17,7 @@
 
 package java.io;
 
-import libcore.base.Streams;
+import libcore.io.Streams;
 
 /**
  * Wraps an existing {@link InputStream} and counts the line terminators

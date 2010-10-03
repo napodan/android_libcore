@@ -20,7 +20,7 @@ package java.util.zip;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import libcore.base.Streams;
+import libcore.io.Streams;
 
 /**
  * An {@code InputStream} filter to compress data. Callers read
