@@ -116,7 +116,7 @@ static void ProcessManager_watchChildren(JNIEnv* env, jobject o) {
                      * wait() other than the two that are handled
                      * immediately above.
                      */
-                    LOGE("Error %d calling wait(): %s", errno,
+                    ALOGE("Error %d calling wait(): %s", errno,
                             strerror(errno));
                     status = WAIT_STATUS_STRANGE_ERRNO;
                     break;
@@ -359,7 +359,7 @@ static pid_t ProcessManager_exec(
     // Re-throw exception if present.
     if (exception != NULL) {
         if (env->Throw(exception) < 0) {
-            LOGE("Error rethrowing exception!");
+            ALOGE("Error rethrowing exception!");
         }
     }
 

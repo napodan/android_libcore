@@ -43,12 +43,12 @@ static jint OSMemory_malloc(JNIEnv* env, jclass, jint size) {
     jboolean allowed = env->CallBooleanMethod(gIDCache.runtimeInstance,
             gIDCache.method_trackExternalAllocation, static_cast<jlong>(size));
     if (!allowed) {
-        LOGW("External allocation of %d bytes was rejected\n", size);
+        ALOGW("External allocation of %d bytes was rejected\n", size);
         jniThrowException(env, "java/lang/OutOfMemoryError", NULL);
         return 0;
     }
 
-    LOGV("OSMemory alloc %d\n", size);
+    ALOGV("OSMemory alloc %d\n", size);
     void* block = malloc(size + sizeof(jlong));
     if (block == NULL) {
         jniThrowException(env, "java/lang/OutOfMemoryError", NULL);
@@ -67,7 +67,7 @@ static jint OSMemory_malloc(JNIEnv* env, jclass, jint size) {
 static void OSMemory_free(JNIEnv* env, jclass, jint address) {
     jlong* p = reinterpret_cast<jlong*>(static_cast<uintptr_t>(address));
     jlong size = *--p;
-    LOGV("OSMemory free %ld\n", size);
+    ALOGV("OSMemory free %ld\n", size);
     env->CallVoidMethod(gIDCache.runtimeInstance, gIDCache.method_trackExternalFree, size);
     free(reinterpret_cast<void*>(p));
 }
@@ -278,7 +278,7 @@ static jint OSMemory_mmapImpl(JNIEnv* env, jclass, jint fd, jlong offset, jlong 
         break;
     default:
         jniThrowIOException(env, EINVAL);
-        LOGE("bad mapMode %i", mapMode);
+        ALOGE("bad mapMode %i", mapMode);
         return -1;
     }
 
@@ -376,13 +376,13 @@ int register_org_apache_harmony_luni_platform_OSMemory(JNIEnv* env) {
         gIDCache.method_trackExternalFree == NULL ||
         method_getRuntime == NULL)
     {
-        LOGE("Unable to find VMRuntime methods\n");
+        ALOGE("Unable to find VMRuntime methods\n");
         return -1;
     }
 
     jobject instance = env->CallStaticObjectMethod(JniConstants::vmRuntimeClass, method_getRuntime);
     if (instance == NULL) {
-        LOGE("Unable to obtain VMRuntime instance\n");
+        ALOGE("Unable to obtain VMRuntime instance\n");
         return -1;
     }
     gIDCache.runtimeInstance = env->NewGlobalRef(instance);

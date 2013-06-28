@@ -106,7 +106,7 @@ static jint dalvik_system_TouchDex_trampoline(JNIEnv* env,
         kExecMode = execModeBuf;
     }
 
-    LOGV("TouchDex trampoline forking\n");
+    ALOGV("TouchDex trampoline forking\n");
     gettimeofday(&startWhen, NULL);
 
     /*
@@ -117,13 +117,13 @@ static jint dalvik_system_TouchDex_trampoline(JNIEnv* env,
     bcp = env->GetStringUTFChars(bcpStr, NULL);
     dexFiles = env->GetStringUTFChars(dexFilesStr, NULL);
     if (bcp == NULL || dexFiles == NULL) {
-        LOGE("Bad values for bcp=%p dexFiles=%p\n", bcp, dexFiles);
+        ALOGE("Bad values for bcp=%p dexFiles=%p\n", bcp, dexFiles);
         abort();
     }
 
     pid = fork();
     if (pid < 0) {
-        LOGE("fork failed: %s", strerror(errno));
+        ALOGE("fork failed: %s", strerror(errno));
         return -1;
     }
 
@@ -131,7 +131,7 @@ static jint dalvik_system_TouchDex_trampoline(JNIEnv* env,
         /* child */
         char* bcpArg;
 
-        LOGV("TouchDex trampoline in child\n");
+        ALOGV("TouchDex trampoline in child\n");
 
         bcpArg = (char*) malloc(strlen(bcp) + strlen(kBcpArgName) +1);
         strcpy(bcpArg, kBcpArgName);
@@ -146,14 +146,14 @@ static jint dalvik_system_TouchDex_trampoline(JNIEnv* env,
         argv[6] = dexFiles;
         argv[7] = NULL;
 
-        //LOGI("Calling execv with args:\n");
+        //ALOGI("Calling execv with args:\n");
         //for (int i = 0; i < argc; i++)
-        //    LOGI(" %d: '%s'\n", i, argv[i]);
+        //    ALOGI(" %d: '%s'\n", i, argv[i]);
 
         execv(kExecFile, (char* const*) argv);
         free(bcpArg);
 
-        LOGE("execv '%s' failed: %s\n", kExecFile, strerror(errno));
+        ALOGE("execv '%s' failed: %s\n", kExecFile, strerror(errno));
         exit(1);
     } else {
         int cc, count, dexCount, timeout;
@@ -192,13 +192,13 @@ static jint dalvik_system_TouchDex_trampoline(JNIEnv* env,
         env->ReleaseStringUTFChars(dexFilesStr, dexFiles);
 
 
-        LOGD("TouchDex parent waiting for pid=%d (timeout=%.1fs)\n",
+        ALOGD("TouchDex parent waiting for pid=%d (timeout=%.1fs)\n",
             (int) pid, timeout / 10.0);
         for (count = 0; count < timeout; count++) {
             /* waitpid doesn't take a timeout, so poll and sleep */
             cc = waitpid(pid, &result, WNOHANG);
             if (cc < 0) {
-                LOGE("waitpid(%d) failed: %s", (int) pid, strerror(errno));
+                ALOGE("waitpid(%d) failed: %s", (int) pid, strerror(errno));
                 return -1;
             } else if (cc == 0) {
                 usleep(100000);     /* 0.1 sec */
@@ -210,11 +210,11 @@ static jint dalvik_system_TouchDex_trampoline(JNIEnv* env,
 
         if (count == timeout) {
             /* note kill(0) returns 0 if the pid is a zombie */
-            LOGE("timed out waiting for %d; kill(0) returns %d\n",
+            ALOGE("timed out waiting for %d; kill(0) returns %d\n",
                 (int) pid, kill(pid, 0));
             logProcStatus(pid);
         } else {
-            LOGV("TouchDex done after %d iterations (kill(0) returns %d)\n",
+            ALOGV("TouchDex done after %d iterations (kill(0) returns %d)\n",
                 count, kill(pid, 0));
         }
 
@@ -222,7 +222,7 @@ static jint dalvik_system_TouchDex_trampoline(JNIEnv* env,
         long long start = startWhen.tv_sec * 1000000 + startWhen.tv_usec;
         long long end = endWhen.tv_sec * 1000000 + endWhen.tv_usec;
 
-        LOGI("Dalvik-cache prep: status=0x%04x, finished in %dms\n",
+        ALOGI("Dalvik-cache prep: status=0x%04x, finished in %dms\n",
             result, (int) ((end - start) / 1000));
 
         if (WIFEXITED(result))
@@ -243,16 +243,16 @@ static void logProcStatus(pid_t pid)
     sprintf(localBuf, "/proc/%d/status", (int) pid);
     fp = fopen(localBuf, "r");
     if (fp == NULL) {
-        LOGI("Unable to open '%s'\n", localBuf);
+        ALOGI("Unable to open '%s'\n", localBuf);
         return;
     }
 
-    LOGI("Contents of %s:\n", localBuf);
+    ALOGI("Contents of %s:\n", localBuf);
     while (true) {
         fgets(localBuf, sizeof(localBuf), fp);
         if (ferror(fp) || feof(fp))
             break;
-        LOGI("  %s", localBuf);
+        ALOGI("  %s", localBuf);
     }
 
     fclose(fp);

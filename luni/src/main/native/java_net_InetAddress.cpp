@@ -54,10 +54,10 @@ static void logIpString(addrinfo* ai, const char* name)
     int result = getnameinfo(ai->ai_addr, ai->ai_addrlen, ipString,
                              sizeof(ipString), NULL, 0, NI_NUMERICHOST);
     if (result == 0) {
-        LOGD("%s: %s (family %d, proto %d)", name, ipString, ai->ai_family,
+        ALOGD("%s: %s (family %d, proto %d)", name, ipString, ai->ai_family,
              ai->ai_protocol);
     } else {
-        LOGE("%s: getnameinfo: %s", name, gai_strerror(result));
+        ALOGE("%s: getnameinfo: %s", name, gai_strerror(result));
     }
 }
 #else
@@ -99,7 +99,7 @@ static jobjectArray InetAddress_getaddrinfo(JNIEnv* env, jclass, jstring javaNam
         addressArray = env->NewObjectArray(addressCount, JniConstants::byteArrayClass, NULL);
         if (addressArray == NULL) {
             // Appropriate exception will be thrown.
-            LOGE("getaddrinfo: could not allocate array of size %i", addressCount);
+            ALOGE("getaddrinfo: could not allocate array of size %i", addressCount);
             freeaddrinfo(addressList);
             return NULL;
         }
@@ -125,7 +125,7 @@ static jobjectArray InetAddress_getaddrinfo(JNIEnv* env, jclass, jstring javaNam
                     break;
                 default:
                     // Unknown address family. Skip this address.
-                    LOGE("getaddrinfo: Unknown address family %d", ai->ai_family);
+                    ALOGE("getaddrinfo: Unknown address family %d", ai->ai_family);
                     continue;
             }
 
@@ -133,7 +133,7 @@ static jobjectArray InetAddress_getaddrinfo(JNIEnv* env, jclass, jstring javaNam
             ScopedLocalRef<jbyteArray> byteArray(env, env->NewByteArray(addressLength));
             if (byteArray.get() == NULL) {
                 // Out of memory error will be thrown on return.
-                LOGE("getaddrinfo: Can't allocate %d-byte array", addressLength);
+                ALOGE("getaddrinfo: Can't allocate %d-byte array", addressLength);
                 addressArray = NULL;
                 break;
             }

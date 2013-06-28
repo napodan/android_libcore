@@ -637,7 +637,7 @@ static void OSNetworkSystem_accept(JNIEnv* env, jobject, jobject serverFileDescr
     timeval timeout(toTimeval(0));
     int rc = setsockopt(clientFd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
     if (rc == -1) {
-        LOGE("couldn't reset SO_RCVTIMEO on accepted socket fd %i: %s", clientFd, strerror(errno));
+        ALOGE("couldn't reset SO_RCVTIMEO on accepted socket fd %i: %s", clientFd, strerror(errno));
         jniThrowSocketException(env, errno);
     }
 
@@ -891,7 +891,7 @@ static bool initFdSet(JNIEnv* env, jobjectArray fdArray, jint count, fd_set* fdS
 
         const int fd = jniGetFDFromFileDescriptor(env, fileDescriptor);
         if (!isValidFd(fd)) {
-            LOGE("selectImpl: ignoring invalid fd %i", fd);
+            ALOGE("selectImpl: ignoring invalid fd %i", fd);
             continue;
         }
 
@@ -990,7 +990,7 @@ static jobject OSNetworkSystem_getSocketLocalAddress(JNIEnv* env,
         // TODO: the public API doesn't allow failure, so this whole method
         // represents a broken design. In practice, though, getsockname can't
         // fail unless we give it invalid arguments.
-        LOGE("getsockname failed: %s (errno=%i)", strerror(errno), errno);
+        ALOGE("getsockname failed: %s (errno=%i)", strerror(errno), errno);
         return NULL;
     }
     return socketAddressToInetAddress(env, &ss);
@@ -1011,7 +1011,7 @@ static jint OSNetworkSystem_getSocketLocalPort(JNIEnv* env, jobject,
         // TODO: the public API doesn't allow failure, so this whole method
         // represents a broken design. In practice, though, getsockname can't
         // fail unless we give it invalid arguments.
-        LOGE("getsockname failed: %s (errno=%i)", strerror(errno), errno);
+        ALOGE("getsockname failed: %s (errno=%i)", strerror(errno), errno);
         return 0;
     }
     return getSocketAddressPort(&ss);
@@ -1022,7 +1022,7 @@ static bool getSocketOption(JNIEnv* env, const NetFd& fd, int level, int option,
     socklen_t size = sizeof(*value);
     int rc = getsockopt(fd.get(), level, option, value, &size);
     if (rc == -1) {
-        LOGE("getSocketOption(fd=%i, level=%i, option=%i) failed: %s (errno=%i)",
+        ALOGE("getSocketOption(fd=%i, level=%i, option=%i) failed: %s (errno=%i)",
                 fd.get(), level, option, strerror(errno), errno);
         jniThrowSocketException(env, errno);
         return false;
@@ -1151,7 +1151,7 @@ template <typename T>
 static void setSocketOption(JNIEnv* env, const NetFd& fd, int level, int option, T* value) {
     int rc = setsockopt(fd.get(), level, option, value, sizeof(*value));
     if (rc == -1) {
-        LOGE("setSocketOption(fd=%i, level=%i, option=%i) failed: %s (errno=%i)",
+        ALOGE("setSocketOption(fd=%i, level=%i, option=%i) failed: %s (errno=%i)",
                 fd.get(), level, option, strerror(errno), errno);
         jniThrowSocketException(env, errno);
     }

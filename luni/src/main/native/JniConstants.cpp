@@ -49,7 +49,7 @@ jclass JniConstants::vmRuntimeClass;
 static jclass findClass(JNIEnv* env, const char* name) {
     jclass result = reinterpret_cast<jclass>(env->NewGlobalRef(env->FindClass(name)));
     if (result == NULL) {
-        LOGE("failed to find class '%s'", name);
+        ALOGE("failed to find class '%s'", name);
         abort();
     }
     return result;

@@ -275,7 +275,7 @@ static void throwSSLExceptionWithSslErrors(
     if (asprintf(&str, "%s: ssl=%p: %s", message, ssl, sslErrorStr) <= 0) {
         // problem with asprintf, just throw argument message, log everything
         throwSSLExceptionStr(env, message);
-        LOGV("%s: ssl=%p: %s", message, ssl, sslErrorStr);
+        ALOGV("%s: ssl=%p: %s", message, ssl, sslErrorStr);
         freeSslErrorState();
         return;
     }
@@ -333,7 +333,7 @@ static void throwSSLExceptionWithSslErrors(
         throwSSLExceptionStr(env, allocStr);
     }
 
-    LOGV("%s", allocStr);
+    ALOGV("%s", allocStr);
     free(allocStr);
     freeSslErrorState();
 }
@@ -1029,7 +1029,7 @@ static const char* get_content_type(int content_type) {
             return "SSL3_RT_APPLICATION_DATA";
         }
         default: {
-            LOGD("Unknown TLS/SSL content type %d", content_type);
+            ALOGD("Unknown TLS/SSL content type %d", content_type);
             return "<unknown>";
         }
     }
@@ -1560,7 +1560,7 @@ static int cert_verify_callback(X509_STORE_CTX* x509_store_ctx, void* arg __attr
     AppData* appData = toAppData(ssl);
     JNIEnv* env = appData->env;
     if (env == NULL) {
-        LOGE("AppData->env missing in cert_verify_callback");
+        ALOGE("AppData->env missing in cert_verify_callback");
         JNI_TRACE("ssl=%p cert_verify_callback => 0", ssl);
         return 0;
     }
@@ -1601,7 +1601,7 @@ static void info_callback(const SSL* ssl, int where, int ret __attribute__ ((unu
     AppData* appData = toAppData(ssl);
     JNIEnv* env = appData->env;
     if (env == NULL) {
-        LOGE("AppData->env missing in info_callback");
+        ALOGE("AppData->env missing in info_callback");
         JNI_TRACE("ssl=%p info_callback env error", ssl);
         return;
     }
@@ -1633,7 +1633,7 @@ static int client_cert_cb(SSL* ssl, X509** x509Out, EVP_PKEY** pkeyOut) {
     AppData* appData = toAppData(ssl);
     JNIEnv* env = appData->env;
     if (env == NULL) {
-        LOGE("AppData->env missing in client_cert_cb");
+        ALOGE("AppData->env missing in client_cert_cb");
         JNI_TRACE("ssl=%p client_cert_cb env error => 0", ssl);
         return 0;
     }
@@ -1902,7 +1902,7 @@ static void NativeCrypto_SSL_use_PrivateKey(JNIEnv* env, jclass,
     const unsigned char* tmp = reinterpret_cast<const unsigned char*>(buf.get());
     Unique_PKCS8_PRIV_KEY_INFO pkcs8(d2i_PKCS8_PRIV_KEY_INFO(NULL, &tmp, buf.size()));
     if (pkcs8.get() == NULL) {
-        LOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
+        ALOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
         throwSSLExceptionWithSslErrors(env, ssl, SSL_ERROR_NONE,
                                        "Error parsing private key from DER to PKCS8");
         SSL_clear(ssl);
@@ -1912,7 +1912,7 @@ static void NativeCrypto_SSL_use_PrivateKey(JNIEnv* env, jclass,
 
     Unique_EVP_PKEY privatekeyevp(EVP_PKCS82PKEY(pkcs8.get()));
     if (privatekeyevp.get() == NULL) {
-        LOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
+        ALOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
         throwSSLExceptionWithSslErrors(env, ssl, SSL_ERROR_NONE,
                                        "Error creating private key from PKCS8");
         SSL_clear(ssl);
@@ -1924,7 +1924,7 @@ static void NativeCrypto_SSL_use_PrivateKey(JNIEnv* env, jclass,
     if (ret == 1) {
         privatekeyevp.release();
     } else {
-        LOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
+        ALOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
         throwSSLExceptionWithSslErrors(env, ssl, SSL_ERROR_NONE, "Error setting private key");
         SSL_clear(ssl);
         JNI_TRACE("ssl=%p NativeCrypto_SSL_use_PrivateKey => error", ssl);
@@ -1975,7 +1975,7 @@ static void NativeCrypto_SSL_use_certificate(JNIEnv* env, jclass,
         certificatesX509[i].reset(d2i_X509(NULL, &tmp, buf.size()));
 
         if (certificatesX509[i].get() == NULL) {
-            LOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
+            ALOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
             throwSSLExceptionWithSslErrors(env, ssl, SSL_ERROR_NONE, "Error parsing certificate");
             SSL_clear(ssl);
             JNI_TRACE("ssl=%p NativeCrypto_SSL_use_certificate => certificates parsing error", ssl);
@@ -1987,7 +1987,7 @@ static void NativeCrypto_SSL_use_certificate(JNIEnv* env, jclass,
     if (ret == 1) {
         certificatesX509[0].release();
     } else {
-        LOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
+        ALOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
         throwSSLExceptionWithSslErrors(env, ssl, SSL_ERROR_NONE, "Error setting certificate");
         SSL_clear(ssl);
         JNI_TRACE("ssl=%p NativeCrypto_SSL_use_certificate => SSL_use_certificate error", ssl);
@@ -2083,7 +2083,7 @@ static void NativeCrypto_SSL_set_client_CA_list(JNIEnv* env, jclass,
         Unique_X509_NAME principalX509Name(d2i_X509_NAME(NULL, &tmp, buf.size()));
 
         if (principalX509Name.get() == NULL) {
-            LOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
+            ALOGE("%s", ERR_error_string(ERR_peek_error(), NULL));
             throwSSLExceptionWithSslErrors(env, ssl, SSL_ERROR_NONE, "Error parsing principal");
             SSL_clear(ssl);
             JNI_TRACE("ssl=%p NativeCrypto_SSL_set_client_CA_list => principals parsing error",
@@ -2484,7 +2484,7 @@ static jint NativeCrypto_SSL_do_handshake(JNIEnv* env, jclass,
                 return 0;
             }
         } else {
-            // LOGE("Unknown error %d during handshake", error);
+            // ALOGE("Unknown error %d during handshake", error);
             break;
         }
     }
@@ -2640,7 +2640,7 @@ static jobjectArray NativeCrypto_SSL_get_peer_cert_chain(JNIEnv* env, jclass, ji
 static int sslRead(JNIEnv* env, SSL* ssl, jobject fdObject, jobject shc, char* buf, jint len,
                    int* sslReturnCode, int* sslErrorCode, int timeout) {
 
-    // LOGD("Entering sslRead, caller requests to read %d bytes...", len);
+    // ALOGD("Entering sslRead, caller requests to read %d bytes...", len);
 
     if (len == 0) {
         // Don't bother doing anything in this case.
@@ -2663,7 +2663,7 @@ static int sslRead(JNIEnv* env, SSL* ssl, jobject fdObject, jobject shc, char* b
 
         unsigned int bytesMoved = BIO_number_read(bio) + BIO_number_written(bio);
 
-        // LOGD("Doing SSL_Read()");
+        // ALOGD("Doing SSL_Read()");
         if (!appData->setCallbackState(env, shc, fdObject)) {
             MUTEX_UNLOCK(appData->mutex);
             return THROWN_SOCKETEXCEPTION;
@@ -2675,7 +2675,7 @@ static int sslRead(JNIEnv* env, SSL* ssl, jobject fdObject, jobject shc, char* b
             sslError = SSL_get_error(ssl, result);
             freeSslErrorState();
         }
-        // LOGD("Returned from SSL_Read() with result %d, error code %d", result, sslError);
+        // ALOGD("Returned from SSL_Read() with result %d, error code %d", result, sslError);
 
         // If we have been successful in moving data around, check whether it
         // might make sense to wake up other blocked threads, so they can give
@@ -2885,7 +2885,7 @@ static jint NativeCrypto_SSL_read(JNIEnv* env, jclass, jint ssl_address, jobject
 static int sslWrite(JNIEnv* env, SSL* ssl, jobject fdObject, jobject shc, const char* buf, jint len,
                     int* sslReturnCode, int* sslErrorCode) {
 
-    // LOGD("Entering sslWrite(), caller requests to write %d bytes...", len);
+    // ALOGD("Entering sslWrite(), caller requests to write %d bytes...", len);
 
     if (len == 0) {
         // Don't bother doing anything in this case.
@@ -2910,7 +2910,7 @@ static int sslWrite(JNIEnv* env, SSL* ssl, jobject fdObject, jobject shc, const 
 
         unsigned int bytesMoved = BIO_number_read(bio) + BIO_number_written(bio);
 
-        // LOGD("Doing SSL_write() with %d bytes to go", len);
+        // ALOGD("Doing SSL_write() with %d bytes to go", len);
         if (!appData->setCallbackState(env, shc, fdObject)) {
             MUTEX_UNLOCK(appData->mutex);
             return THROWN_SOCKETEXCEPTION;
@@ -2922,7 +2922,7 @@ static int sslWrite(JNIEnv* env, SSL* ssl, jobject fdObject, jobject shc, const 
             sslError = SSL_get_error(ssl, result);
             freeSslErrorState();
         }
-        // LOGD("Returned from SSL_write() with result %d, error code %d", result, error);
+        // ALOGD("Returned from SSL_write() with result %d, error code %d", result, error);
 
         // If we have been successful in moving data around, check whether it
         // might make sense to wake up other blocked threads, so they can give
@@ -3000,7 +3000,7 @@ static int sslWrite(JNIEnv* env, SSL* ssl, jobject fdObject, jobject shc, const 
             }
         }
     }
-    // LOGD("Successfully wrote %d bytes", count);
+    // ALOGD("Successfully wrote %d bytes", count);
 
     return count;
 }
