@@ -122,7 +122,7 @@ ifeq ($(WITH_HOST_DALVIK),true)
     LOCAL_SHARED_LIBRARIES := $(core_shared_libraries)
     LOCAL_STATIC_LIBRARIES := $(core_static_libraries)
     LOCAL_MODULE_TAGS := optional
-    LOCAL_MODULE := libjavacore-host
+    LOCAL_MODULE := libjavacore
     LOCAL_ADDITIONAL_DEPENDENCIES += $(HOST_OUT)/etc/security/cacerts.bks
     include $(BUILD_HOST_STATIC_LIBRARY)
 
