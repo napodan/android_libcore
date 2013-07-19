@@ -85,26 +85,6 @@ include $(BUILD_JAVA_LIBRARY)
 core-intermediates := ${intermediates}
 
 
-# Make core-junit
-include $(CLEAR_VARS)
-LOCAL_SRC_FILES := $(call all-main-java-files-under,junit)
-LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := core
-LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE := core-junit
-include $(BUILD_JAVA_LIBRARY)
-
-# Make core-junitrunner
-include $(CLEAR_VARS)
-LOCAL_SRC_FILES := $(call all-test-java-files-under,junit)
-LOCAL_JAVA_RESOURCE_DIRS := $(test_resource_dirs)
-LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := core core-junit
-LOCAL_DX_FLAGS := --core-library
-LOCAL_MODULE_TAGS := tests
-LOCAL_MODULE := core-junitrunner
-include $(BUILD_JAVA_LIBRARY)
-
 # Definitions to make the sqlite JDBC driver.
 
 include $(CLEAR_VARS)
@@ -128,7 +108,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(call all-test-java-files-under,dalvik)
 LOCAL_JAVA_RESOURCE_DIRS := $(test_resource_dirs)
 LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := core core-junit core-junitrunner core-tests-support
+LOCAL_JAVA_LIBRARIES := core core-junit  core-tests-support
 LOCAL_DX_FLAGS := --core-library
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE := core-tests-dalvik
@@ -138,7 +118,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(call all-test-java-files-under,dom)
 LOCAL_JAVA_RESOURCE_DIRS := $(test_resource_dirs)
 LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := core core-junit core-junitrunner core-tests-support
+LOCAL_JAVA_LIBRARIES := core core-junit core-tests-support
 LOCAL_DX_FLAGS := --core-library
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE := core-tests-dom
@@ -148,7 +128,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(call all-test-java-files-under,json)
 LOCAL_JAVA_RESOURCE_DIRS := $(test_resource_dirs)
 LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := core core-junit core-junitrunner core-tests-support
+LOCAL_JAVA_LIBRARIES := core core-junit core-tests-support
 LOCAL_DX_FLAGS := --core-library
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE := core-tests-json
@@ -166,7 +146,6 @@ LOCAL_JAVA_LIBRARIES := \
         bouncycastle \
         core \
         core-junit \
-        core-junitrunner \
         core-tests-support \
         core-tests-dalvik \
         core-tests-dom \
@@ -186,7 +165,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(call all-test-java-files-under,support)
 LOCAL_JAVA_RESOURCE_DIRS := $(test_resource_dirs)
 LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := bouncycastle core core-junit core-junitrunner
+LOCAL_JAVA_LIBRARIES := bouncycastle core core-junit
 LOCAL_DX_FLAGS := --core-library
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE := core-tests-support
@@ -196,7 +175,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(call all-test-java-files-under,xml)
 LOCAL_JAVA_RESOURCE_DIRS := $(test_resource_dirs)
 LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := core core-junit core-junitrunner core-tests-support
+LOCAL_JAVA_LIBRARIES := core core-junit core-tests-support
 LOCAL_DX_FLAGS := --core-library
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE := core-tests-xml
@@ -207,7 +186,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(call all-test-java-files-under,support)
 LOCAL_JAVA_RESOURCE_DIRS := $(test_resource_dirs)
 LOCAL_NO_STANDARD_LIBRARIES := true
-LOCAL_JAVA_LIBRARIES := bouncycastle core core-junit core-junitrunner
+LOCAL_JAVA_LIBRARIES := bouncycastle core core-junit
 LOCAL_DX_FLAGS := --core-library
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE := core-tests-supportlib
