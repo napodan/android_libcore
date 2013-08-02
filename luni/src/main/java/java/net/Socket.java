@@ -17,6 +17,7 @@
 
 package java.net;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1131,6 +1132,13 @@ public class Socket {
      */
     public SocketChannel getChannel() {
         return null;
+    }
+
+    /**
+     * @hide internal use only
+     */
+    public FileDescriptor getFileDescriptor$() {
+        return impl.fd;
     }
 
     /**
