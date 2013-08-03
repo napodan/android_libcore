@@ -17,7 +17,7 @@
 
 package java.text;
 
-import com.ibm.icu4jni.text.NativeBreakIterator;
+import libcore.icu.NativeBreakIterator;
 import libcore.icu.ICU;
 import java.util.Locale;
 

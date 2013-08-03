@@ -22,9 +22,9 @@ namespace android {
 }
 
 extern int register_com_ibm_icu4jni_converters_NativeConverter(JNIEnv* env);
-extern int register_com_ibm_icu4jni_text_NativeBreakIterator(JNIEnv* env);
+extern int register_libcore_icu_NativeBreakIterator(JNIEnv* env);
 extern int register_com_ibm_icu4jni_text_NativeCollator(JNIEnv* env);
-extern int register_com_ibm_icu4jni_text_NativeDecimalFormat(JNIEnv* env);
+extern int register_libcore_icu_NativeDecimalFormat(JNIEnv* env);
 extern int register_libcore_icu_ICU(JNIEnv* env);
 extern int register_java_io_Console(JNIEnv* env);
 extern int register_java_io_File(JNIEnv* env);
@@ -73,9 +73,9 @@ extern "C" int registerCoreLibrariesJni(JNIEnv* env) {
 
     bool result =
             register_com_ibm_icu4jni_converters_NativeConverter(env) != -1 &&
-            register_com_ibm_icu4jni_text_NativeBreakIterator(env) != -1 &&
+            register_libcore_icu_NativeBreakIterator(env) != -1 &&
             register_com_ibm_icu4jni_text_NativeCollator(env) != -1 &&
-            register_com_ibm_icu4jni_text_NativeDecimalFormat(env) != -1 &&
+            register_libcore_icu_NativeDecimalFormat(env) != -1 &&
             register_libcore_icu_ICU(env) != -1 &&
             register_java_io_Console(env) != -1 &&
             register_java_io_File(env) != -1 &&

@@ -67,7 +67,7 @@ void JniConstants::init(JNIEnv* env) {
     deflaterClass = findClass(env, "java/util/zip/Deflater");
     doubleClass = findClass(env, "java/lang/Double");
     fieldClass = findClass(env, "java/lang/reflect/Field");
-    fieldPositionIteratorClass = findClass(env, "com/ibm/icu4jni/text/NativeDecimalFormat$FieldPositionIterator");
+    fieldPositionIteratorClass = findClass(env, "libcore/icu/NativeDecimalFormat$FieldPositionIterator");
     inetAddressClass = findClass(env, "java/net/InetAddress");
     inflaterClass = findClass(env, "java/util/zip/Inflater");
     integerClass = findClass(env, "java/lang/Integer");

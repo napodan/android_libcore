@@ -15,7 +15,7 @@
  */
 package java.util;
 
-import com.ibm.icu4jni.text.NativeDecimalFormat;
+import libcore.icu.NativeDecimalFormat;
 import libcore.icu.LocaleData;
 import java.io.BufferedWriter;
 import java.io.Closeable;

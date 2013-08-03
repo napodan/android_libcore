@@ -17,7 +17,7 @@
 
 package java.text;
 
-import com.ibm.icu4jni.text.NativeDecimalFormat;
+import libcore.icu.NativeDecimalFormat;
 import libcore.icu.LocaleData;
 import java.io.IOException;
 import java.io.ObjectInputStream;
