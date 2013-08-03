@@ -16,7 +16,7 @@
 
 package java.lang;
 
-import com.ibm.icu4jni.util.ICU;
+import libcore.icu.ICU;
 import java.util.Locale;
 
 /**

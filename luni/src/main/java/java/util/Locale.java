@@ -17,7 +17,7 @@
 
 package java.util;
 
-import com.ibm.icu4jni.util.ICU;
+import libcore.icu.ICU;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

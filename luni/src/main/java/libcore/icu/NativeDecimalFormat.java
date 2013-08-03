@@ -16,7 +16,7 @@
 
 package com.ibm.icu4jni.text;
 
-import com.ibm.icu4jni.util.LocaleData;
+import libcore.icu.LocaleData;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;

@@ -72,7 +72,7 @@ void JniConstants::init(JNIEnv* env) {
     inflaterClass = findClass(env, "java/util/zip/Inflater");
     integerClass = findClass(env, "java/lang/Integer");
     interfaceAddressClass = findClass(env, "java/net/InterfaceAddress");
-    localeDataClass = findClass(env, "com/ibm/icu4jni/util/LocaleData");
+    localeDataClass = findClass(env, "libcore/icu/LocaleData");
     longClass = findClass(env, "java/lang/Long");
     methodClass = findClass(env, "java/lang/reflect/Method");
     multicastGroupRequestClass = findClass(env, "java/net/MulticastGroupRequest");

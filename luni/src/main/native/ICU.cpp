@@ -563,10 +563,10 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(ICU, getISO3LanguageNative, "(Ljava/lang/String;)Ljava/lang/String;"),
     NATIVE_METHOD(ICU, getISOCountriesNative, "()[Ljava/lang/String;"),
     NATIVE_METHOD(ICU, getISOLanguagesNative, "()[Ljava/lang/String;"),
-    NATIVE_METHOD(ICU, initLocaleDataImpl, "(Ljava/lang/String;Lcom/ibm/icu4jni/util/LocaleData;)Z"),
+    NATIVE_METHOD(ICU, initLocaleDataImpl, "(Ljava/lang/String;Llibcore/icu/LocaleData;)Z"),
     NATIVE_METHOD(ICU, toLowerCase, "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"),
     NATIVE_METHOD(ICU, toUpperCase, "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"),
 };
-int register_com_ibm_icu4jni_util_ICU(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "com/ibm/icu4jni/util/ICU", gMethods, NELEM(gMethods));
+int register_libcore_icu_ICU(JNIEnv* env) {
+    return jniRegisterNativeMethods(env, "libcore/icu/ICU", gMethods, NELEM(gMethods));
 }

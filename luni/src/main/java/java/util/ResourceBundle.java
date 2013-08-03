@@ -17,7 +17,7 @@
 
 package java.util;
 
-import com.ibm.icu4jni.util.ICU;
+import libcore.icu.ICU;
 import dalvik.system.VMStack;
 import java.io.File;
 import java.io.IOException;

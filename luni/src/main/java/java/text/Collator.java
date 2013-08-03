@@ -17,7 +17,7 @@
 
 package java.text;
 
-import com.ibm.icu4jni.util.ICU;
+import libcore.icu.ICU;
 import java.util.Comparator;
 import java.util.Locale;
 
