@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package libcore.base;
+package libcore.io;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -21,7 +21,7 @@ import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import libcore.base.Streams;
+import libcore.io.Streams;
 
 /**
  * This class provides an implementation of {@code FilterInputStream} that

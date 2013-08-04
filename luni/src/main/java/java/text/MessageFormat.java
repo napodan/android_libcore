@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Vector;
-import libcore.base.Objects;
+import libcore.util.Objects;
 
 /**
  * Produces concatenated messages in language-neutral way. New code

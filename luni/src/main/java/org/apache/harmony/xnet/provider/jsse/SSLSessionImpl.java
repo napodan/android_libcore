@@ -33,7 +33,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionBindingEvent;
 import javax.net.ssl.SSLSessionBindingListener;
 import javax.net.ssl.SSLSessionContext;
-import libcore.base.Objects;
+import libcore.util.Objects;
 
 /**
  *

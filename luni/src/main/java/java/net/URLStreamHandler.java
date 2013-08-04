@@ -18,7 +18,7 @@
 package java.net;
 
 import java.io.IOException;
-import libcore.base.Objects;
+import libcore.util.Objects;
 import org.apache.harmony.luni.util.URLUtil;
 
 /**

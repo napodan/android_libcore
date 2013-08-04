@@ -20,7 +20,7 @@ import java.nio.charset.Charsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
-import libcore.base.Objects;
+import libcore.util.Objects;
 
 final class ZoneInfo extends TimeZone {
 

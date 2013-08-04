@@ -17,7 +17,7 @@
 
 package java.io;
 
-import libcore.base.Streams;
+import libcore.io.Streams;
 
 /**
  * The base class for all input streams. An input stream is a means of reading
