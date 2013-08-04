@@ -1,22 +1,21 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent;
-
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.security.AccessControlContext;
-import java.security.AccessControlException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-// import sun.security.util.SecurityConstants; // android-removed
+import java.security.PrivilegedActionException;
 
+// BEGIN android-note
+// removed security manager docs
+// END android-note
 /**
  * Factory and utility methods for {@link Executor}, {@link
  * ExecutorService}, {@link ScheduledExecutorService}, {@link
@@ -56,7 +55,7 @@ public class Executors {
      *
      * @param nThreads the number of threads in the pool
      * @return the newly created thread pool
-     * @throws IllegalArgumentException if <tt>nThreads &lt;= 0</tt>
+     * @throws IllegalArgumentException if {@code nThreads <= 0}
      */
     public static ExecutorService newFixedThreadPool(int nThreads) {
         return new ThreadPoolExecutor(nThreads, nThreads,
@@ -81,7 +80,7 @@ public class Executors {
      * @param threadFactory the factory to use when creating new threads
      * @return the newly created thread pool
      * @throws NullPointerException if threadFactory is null
-     * @throws IllegalArgumentException if <tt>nThreads &lt;= 0</tt>
+     * @throws IllegalArgumentException if {@code nThreads <= 0}
      */
     public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory) {
         return new ThreadPoolExecutor(nThreads, nThreads,
@@ -215,7 +214,7 @@ public class Executors {
      * @param corePoolSize the number of threads to keep in the pool,
      * even if they are idle.
      * @return a newly created scheduled thread pool
-     * @throws IllegalArgumentException if <tt>corePoolSize &lt; 0</tt>
+     * @throws IllegalArgumentException if {@code corePoolSize < 0}
      */
     public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) {
         return new ScheduledThreadPoolExecutor(corePoolSize);
@@ -229,7 +228,7 @@ public class Executors {
      * @param threadFactory the factory to use when the executor
      * creates a new thread.
      * @return a newly created scheduled thread pool
-     * @throws IllegalArgumentException if <tt>corePoolSize &lt; 0</tt>
+     * @throws IllegalArgumentException if {@code corePoolSize < 0}
      * @throws NullPointerException if threadFactory is null
      */
     public static ScheduledExecutorService newScheduledThreadPool(
@@ -273,10 +272,7 @@ public class Executors {
     /**
      * Returns a default thread factory used to create new threads.
      * This factory creates all new threads used by an Executor in the
-     * same {@link ThreadGroup}. If there is a {@link
-     * java.lang.SecurityManager}, it uses the group of {@link
-     * System#getSecurityManager}, else the group of the thread
-     * invoking this <tt>defaultThreadFactory</tt> method. Each new
+     * same {@link ThreadGroup}. Each new
      * thread is created as a non-daemon thread with priority set to
      * the smaller of <tt>Thread.NORM_PRIORITY</tt> and the maximum
      * priority permitted in the thread group.  New threads have names
@@ -291,36 +287,7 @@ public class Executors {
     }
 
     /**
-     * Returns a thread factory used to create new threads that
-     * have the same permissions as the current thread.
-     * This factory creates threads with the same settings as {@link
-     * Executors#defaultThreadFactory}, additionally setting the
-     * AccessControlContext and contextClassLoader of new threads to
-     * be the same as the thread invoking this
-     * <tt>privilegedThreadFactory</tt> method.  A new
-     * <tt>privilegedThreadFactory</tt> can be created within an
-     * {@link AccessController#doPrivileged} action setting the
-     * current thread's access control context to create threads with
-     * the selected permission settings holding within that action.
-     *
-     * <p> Note that while tasks running within such threads will have
-     * the same access control and class loader settings as the
-     * current thread, they need not have the same {@link
-     * java.lang.ThreadLocal} or {@link
-     * java.lang.InheritableThreadLocal} values. If necessary,
-     * particular values of thread locals can be set or reset before
-     * any task runs in {@link ThreadPoolExecutor} subclasses using
-     * {@link ThreadPoolExecutor#beforeExecute}. Also, if it is
-     * necessary to initialize worker threads to have the same
-     * InheritableThreadLocal settings as some other designated
-     * thread, you can create a custom ThreadFactory in which that
-     * thread waits for and services requests to create others that
-     * will inherit its values.
-     *
-     * @return a thread factory
-     * @throws AccessControlException if the current access control
-     * context does not have permission to both get and set context
-     * class loader.
+     * Legacy security code; do not use.
      */
     public static ThreadFactory privilegedThreadFactory() {
         return new PrivilegedThreadFactory();
@@ -385,18 +352,7 @@ public class Executors {
     }
 
     /**
-     * Returns a {@link Callable} object that will, when
-     * called, execute the given <tt>callable</tt> under the current
-     * access control context. This method should normally be
-     * invoked within an {@link AccessController#doPrivileged} action
-     * to create callables that will, if possible, execute under the
-     * selected permission settings holding within that action; or if
-     * not possible, throw an associated {@link
-     * AccessControlException}.
-     * @param callable the underlying task
-     * @return a callable object
-     * @throws NullPointerException if callable null
-     *
+     * Legacy security code; do not use.
      */
     public static <T> Callable<T> privilegedCallable(Callable<T> callable) {
         if (callable == null)
@@ -407,20 +363,10 @@ public class Executors {
     /**
      * Returns a {@link Callable} object that will, when
      * called, execute the given <tt>callable</tt> under the current
-     * access control context, with the current context class loader
-     * as the context class loader. This method should normally be
-     * invoked within an {@link AccessController#doPrivileged} action
-     * to create callables that will, if possible, execute under the
-     * selected permission settings holding within that action; or if
-     * not possible, throw an associated {@link
-     * AccessControlException}.
-     * @param callable the underlying task
+     * with the current context class loader as the context class loader.
      *
      * @return a callable object
      * @throws NullPointerException if callable null
-     * @throws AccessControlException if the current access control
-     * context does not have permission to both set and get context
-     * class loader.
      */
     public static <T> Callable<T> privilegedCallableUsingCurrentClassLoader(Callable<T> callable) {
         if (callable == null)
@@ -482,17 +428,19 @@ public class Executors {
         private final ClassLoader ccl;
 
         PrivilegedCallableUsingCurrentClassLoader(Callable<T> task) {
-            SecurityManager sm = System.getSecurityManager();
-            if (sm != null) {
-                // Calls to getContextClassLoader from this class
-                // never trigger a security check, but we check
-                // whether our callers have this permission anyways.
-                sm.checkPermission(new RuntimePermission("getContextClassLoader")); // android-changed
-
-                // Whether setContextClassLoader turns out to be necessary
-                // or not, we fail fast if permission is not available.
-                sm.checkPermission(new RuntimePermission("setContextClassLoader"));
-            }
+            // BEGIN android-removed
+            // SecurityManager sm = System.getSecurityManager();
+            // if (sm != null) {
+            //     // Calls to getContextClassLoader from this class
+            //     // never trigger a security check, but we check
+            //     // whether our callers have this permission anyways.
+            //     sm.checkPermission(SecurityConstants.GET_CLASSLOADER_PERMISSION);
+            //
+            //     // Whether setContextClassLoader turns out to be necessary
+            //     // or not, we fail fast if permission is not available.
+            //     sm.checkPermission(new RuntimePermission("setContextClassLoader"));
+            // }
+            // END android-removed
             this.task = task;
             this.acc = AccessController.getContext();
             this.ccl = Thread.currentThread().getContextClassLoader();
@@ -535,8 +483,8 @@ public class Executors {
 
         DefaultThreadFactory() {
             SecurityManager s = System.getSecurityManager();
-            group = (s != null)? s.getThreadGroup() :
-                                 Thread.currentThread().getThreadGroup();
+            group = (s != null) ? s.getThreadGroup() :
+                                  Thread.currentThread().getThreadGroup();
             namePrefix = "pool-" +
                           poolNumber.getAndIncrement() +
                          "-thread-";
@@ -563,16 +511,18 @@ public class Executors {
 
         PrivilegedThreadFactory() {
             super();
-            SecurityManager sm = System.getSecurityManager();
-            if (sm != null) {
-                // Calls to getContextClassLoader from this class
-                // never trigger a security check, but we check
-                // whether our callers have this permission anyways.
-                sm.checkPermission(new RuntimePermission("getContextClassLoader")); // android-changed
-
-                // Fail fast
-                sm.checkPermission(new RuntimePermission("setContextClassLoader"));
-            }
+            // BEGIN android-removed
+            // SecurityManager sm = System.getSecurityManager();
+            // if (sm != null) {
+            //     // Calls to getContextClassLoader from this class
+            //     // never trigger a security check, but we check
+            //     // whether our callers have this permission anyways.
+            //     sm.checkPermission(SecurityConstants.GET_CLASSLOADER_PERMISSION);
+            //
+            //     // Fail fast
+            //     sm.checkPermission(new RuntimePermission("setContextClassLoader"));
+            // }
+            // END android-removed
             this.acc = AccessController.getContext();
             this.ccl = Thread.currentThread().getContextClassLoader();
         }
@@ -642,12 +592,8 @@ public class Executors {
         FinalizableDelegatedExecutorService(ExecutorService executor) {
             super(executor);
         }
-        @Override protected void finalize() throws Throwable {
-            try {
-                super.shutdown();
-            } finally {
-                super.finalize();
-            }
+        protected void finalize() {
+            super.shutdown();
         }
     }
 

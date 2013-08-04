@@ -1,11 +1,13 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent.atomic;
 
+import java.util.Arrays;
+import java.lang.reflect.Array;
 import sun.misc.Unsafe;
 
 /**
@@ -20,10 +22,27 @@ import sun.misc.Unsafe;
 public class AtomicReferenceArray<E> implements java.io.Serializable {
     private static final long serialVersionUID = -6209656149925076980L;
 
-    private static final Unsafe unsafe = UnsafeAccess.THE_ONE; // android-changed
-    private static final int base = unsafe.arrayBaseOffset(Object[].class);
-    private static final int scale = unsafe.arrayIndexScale(Object[].class);
-    private final Object[] array;
+    private static final Unsafe unsafe;
+    private static final int base;
+    private static final int shift;
+    private static final long arrayFieldOffset;
+    private final Object[] array; // must have exact type Object[]
+
+    static {
+        int scale;
+        try {
+            unsafe = Unsafe.getUnsafe();
+            arrayFieldOffset = unsafe.objectFieldOffset
+                (AtomicReferenceArray.class.getDeclaredField("array"));
+            base = unsafe.arrayBaseOffset(Object[].class);
+            scale = unsafe.arrayIndexScale(Object[].class);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+        if ((scale & (scale - 1)) != 0)
+            throw new Error("data type scale not a power of two");
+        shift = 31 - Integer.numberOfLeadingZeros(scale);
+    }
 
     private long checkedByteOffset(int i) {
         if (i < 0 || i >= array.length)
@@ -33,12 +52,12 @@ public class AtomicReferenceArray<E> implements java.io.Serializable {
     }
 
     private static long byteOffset(int i) {
-        return base + (long) i * scale;
+        return ((long) i << shift) + base;
     }
 
     /**
      * Creates a new AtomicReferenceArray of the given length, with all
-     * elements initially zero.
+     * elements initially null.
      *
      * @param length the length of the array
      */
@@ -55,7 +74,7 @@ public class AtomicReferenceArray<E> implements java.io.Serializable {
      */
     public AtomicReferenceArray(E[] array) {
         // Visibility guaranteed by final field guarantees
-        this.array = array.clone();
+        this.array = Arrays.copyOf(array, array.length, Object[].class);
     }
 
     /**
@@ -114,7 +133,7 @@ public class AtomicReferenceArray<E> implements java.io.Serializable {
     public final E getAndSet(int i, E newValue) {
         long offset = checkedByteOffset(i);
         while (true) {
-            E current = (E) getRaw(offset);
+            E current = getRaw(offset);
             if (compareAndSetRaw(offset, current, newValue))
                 return current;
         }
@@ -160,7 +179,7 @@ public class AtomicReferenceArray<E> implements java.io.Serializable {
      * @return the String representation of the current values of array
      */
     public String toString() {
-           int iMax = array.length - 1;
+        int iMax = array.length - 1;
         if (iMax == -1)
             return "[]";
 
@@ -170,8 +189,24 @@ public class AtomicReferenceArray<E> implements java.io.Serializable {
             b.append(getRaw(byteOffset(i)));
             if (i == iMax)
                 return b.append(']').toString();
-            b.append(", ");
+            b.append(',').append(' ');
         }
+    }
+
+    /**
+     * Reconstitutes the instance from a stream (that is, deserializes it).
+     * @param s the stream
+     */
+    private void readObject(java.io.ObjectInputStream s)
+        throws java.io.IOException, ClassNotFoundException,
+        java.io.InvalidObjectException {
+        // Note: This must be changed if any additional fields are defined
+        Object a = s.readFields().get("array", null);
+        if (a == null || !a.getClass().isArray())
+            throw new java.io.InvalidObjectException("Not array type");
+        if (a.getClass() != Object[].class)
+            a = Arrays.copyOf((Object[])a, Array.getLength(a), Object[].class);
+        unsafe.putObjectVolatile(this, arrayFieldOffset, a);
     }
 
 }

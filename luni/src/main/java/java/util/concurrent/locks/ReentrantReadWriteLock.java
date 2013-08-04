@@ -1,13 +1,12 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent.locks;
-
-import java.util.Collection;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.*;
 
 /**
  * An implementation of {@link ReadWriteLock} supporting similar
@@ -33,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * <dt><b><i>Fair mode</i></b>
  * <dd> When constructed as fair, threads contend for entry using an
  * approximately arrival-order policy. When the currently held lock
- * is released either the longest-waiting single writer thread will
+ * is released, either the longest-waiting single writer thread will
  * be assigned the write lock, or if there is a group of reader threads
  * waiting longer than all waiting writer threads, that group will be
  * assigned the read lock.
@@ -51,8 +50,8 @@ import java.util.concurrent.TimeUnit;
  * will block unless both the read lock and write lock are free (which
  * implies there are no waiting threads).  (Note that the non-blocking
  * {@link ReadLock#tryLock()} and {@link WriteLock#tryLock()} methods
- * do not honor this fair setting and will acquire the lock if it is
- * possible, regardless of waiting threads.)
+ * do not honor this fair setting and will immediately acquire the lock
+ * if it is possible, regardless of waiting threads.)
  * <p>
  * </dl>
  *
@@ -114,21 +113,21 @@ import java.util.concurrent.TimeUnit;
  *   void processCachedData() {
  *     rwl.readLock().lock();
  *     if (!cacheValid) {
- *        // Must release read lock before acquiring write lock
- *        rwl.readLock().unlock();
- *        rwl.writeLock().lock();
- *        try {
- *          // Recheck state because another thread might have
- *          // acquired write lock and changed state before we did.
- *          if (!cacheValid) {
- *            data = ...
- *            cacheValid = true;
- *          }
- *          // Downgrade by acquiring read lock before releasing write lock
- *          rwl.readLock().lock();
- *        } finally  {
- *          rwl.writeLock().unlock(); // Unlock write, still hold read
- *        }
+ *       // Must release read lock before acquiring write lock
+ *       rwl.readLock().unlock();
+ *       rwl.writeLock().lock();
+ *       try {
+ *         // Recheck state because another thread might have
+ *         // acquired write lock and changed state before we did.
+ *         if (!cacheValid) {
+ *           data = ...
+ *           cacheValid = true;
+ *         }
+ *         // Downgrade by acquiring read lock before releasing write lock
+ *         rwl.readLock().lock();
+ *       } finally {
+ *         rwl.writeLock().unlock(); // Unlock write, still hold read
+ *       }
  *     }
  *
  *     try {
@@ -147,33 +146,33 @@ import java.util.concurrent.TimeUnit;
  * is a class using a TreeMap that is expected to be large and
  * concurrently accessed.
  *
- * <pre>{@code
+ *  <pre> {@code
  * class RWDictionary {
- *    private final Map<String, Data> m = new TreeMap<String, Data>();
- *    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
- *    private final Lock r = rwl.readLock();
- *    private final Lock w = rwl.writeLock();
+ *   private final Map<String, Data> m = new TreeMap<String, Data>();
+ *   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+ *   private final Lock r = rwl.readLock();
+ *   private final Lock w = rwl.writeLock();
  *
- *    public Data get(String key) {
- *        r.lock();
- *        try { return m.get(key); }
- *        finally { r.unlock(); }
- *    }
- *    public String[] allKeys() {
- *        r.lock();
- *        try { return m.keySet().toArray(); }
- *        finally { r.unlock(); }
- *    }
- *    public Data put(String key, Data value) {
- *        w.lock();
- *        try { return m.put(key, value); }
- *        finally { w.unlock(); }
- *    }
- *    public void clear() {
- *        w.lock();
- *        try { m.clear(); }
- *        finally { w.unlock(); }
- *    }
+ *   public Data get(String key) {
+ *     r.lock();
+ *     try { return m.get(key); }
+ *     finally { r.unlock(); }
+ *   }
+ *   public String[] allKeys() {
+ *     r.lock();
+ *     try { return m.keySet().toArray(); }
+ *     finally { r.unlock(); }
+ *   }
+ *   public Data put(String key, Data value) {
+ *     w.lock();
+ *     try { return m.put(key, value); }
+ *     finally { w.unlock(); }
+ *   }
+ *   public void clear() {
+ *     w.lock();
+ *     try { m.clear(); }
+ *     finally { w.unlock(); }
+ *   }
  * }}</pre>
  *
  * <h3>Implementation Notes</h3>
@@ -186,7 +185,8 @@ import java.util.concurrent.TimeUnit;
  * @author Doug Lea
  *
  */
-public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializable  {
+public class ReentrantReadWriteLock
+        implements ReadWriteLock, java.io.Serializable {
     private static final long serialVersionUID = -6992448646407690164L;
     /** Inner class providing readlock */
     private final ReentrantReadWriteLock.ReadLock readerLock;
@@ -222,7 +222,7 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
      * Synchronization implementation for ReentrantReadWriteLock.
      * Subclassed into fair and nonfair versions.
      */
-    static abstract class Sync extends AbstractQueuedSynchronizer {
+    abstract static class Sync extends AbstractQueuedSynchronizer {
         private static final long serialVersionUID = 6317671515068378041L;
 
         /*
@@ -589,7 +589,7 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
 
         final Thread getOwner() {
             // Must read state before owner to ensure memory consistency
-            return ((exclusiveCount(getState()) == 0)?
+            return ((exclusiveCount(getState()) == 0) ?
                     null :
                     getExclusiveOwnerThread());
         }
@@ -624,7 +624,9 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
         }
 
         /**
-         * Reconstitute this lock instance from a stream
+         * Reconstitutes this lock instance from a stream (that is,
+         * deserializes it).
+         *
          * @param s the stream
          */
         private void readObject(java.io.ObjectInputStream s)
@@ -640,7 +642,7 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
     /**
      * Nonfair version of Sync
      */
-    final static class NonfairSync extends Sync {
+    static final class NonfairSync extends Sync {
         private static final long serialVersionUID = -8159625535654395037L;
         final boolean writerShouldBlock() {
             return false; // writers can always barge
@@ -660,7 +662,7 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
     /**
      * Fair version of Sync
      */
-    final static class FairSync extends Sync {
+    static final class FairSync extends Sync {
         private static final long serialVersionUID = -2274990926593161451L;
         final boolean writerShouldBlock() {
             return hasQueuedPredecessors();
@@ -673,7 +675,7 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
     /**
      * The lock returned by method {@link ReentrantReadWriteLock#readLock}.
      */
-    public static class ReadLock implements Lock, java.io.Serializable  {
+    public static class ReadLock implements Lock, java.io.Serializable {
         private static final long serialVersionUID = -5992448646407690164L;
         private final Sync sync;
 
@@ -789,8 +791,11 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
          * permit barging on a fair lock then combine the timed and
          * un-timed forms together:
          *
-         * <pre>if (lock.tryLock() || lock.tryLock(timeout, unit) ) { ... }
-         * </pre>
+         *  <pre> {@code
+         * if (lock.tryLock() ||
+         *     lock.tryLock(timeout, unit)) {
+         *   ...
+         * }}</pre>
          *
          * <p>If the write lock is held by another thread then the
          * current thread becomes disabled for thread scheduling
@@ -838,7 +843,8 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
          * @throws NullPointerException if the time unit is null
          *
          */
-        public boolean tryLock(long timeout, TimeUnit unit) throws InterruptedException {
+        public boolean tryLock(long timeout, TimeUnit unit)
+                throws InterruptedException {
             return sync.tryAcquireSharedNanos(1, unit.toNanos(timeout));
         }
 
@@ -879,7 +885,7 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
     /**
      * The lock returned by method {@link ReentrantReadWriteLock#writeLock}.
      */
-    public static class WriteLock implements Lock, java.io.Serializable  {
+    public static class WriteLock implements Lock, java.io.Serializable {
         private static final long serialVersionUID = -4992448646407690164L;
         private final Sync sync;
 
@@ -1018,8 +1024,11 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
          * that does permit barging on a fair lock then combine the
          * timed and un-timed forms together:
          *
-         * <pre>if (lock.tryLock() || lock.tryLock(timeout, unit) ) { ... }
-         * </pre>
+         *  <pre> {@code
+         * if (lock.tryLock() ||
+         *     lock.tryLock(timeout, unit)) {
+         *   ...
+         * }}</pre>
          *
          * <p>If the current thread already holds this lock then the
          * hold count is incremented by one and the method returns
@@ -1079,7 +1088,8 @@ public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializab
          * @throws NullPointerException if the time unit is null
          *
          */
-        public boolean tryLock(long timeout, TimeUnit unit) throws InterruptedException {
+        public boolean tryLock(long timeout, TimeUnit unit)
+                throws InterruptedException {
             return sync.tryAcquireNanos(1, unit.toNanos(timeout));
         }
 

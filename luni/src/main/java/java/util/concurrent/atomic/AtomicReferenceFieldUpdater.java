@@ -1,16 +1,13 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent.atomic;
-
-import dalvik.system.VMStack;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Modifier;
+import dalvik.system.VMStack; // android-added
 import sun.misc.Unsafe;
+import java.lang.reflect.*;
 
 /**
  * A reflection-based utility that enables atomic updates to
@@ -20,13 +17,13 @@ import sun.misc.Unsafe;
  * independently subject to atomic updates. For example, a tree node
  * might be declared as
  *
- * <pre>
+ *  <pre> {@code
  * class Node {
  *   private volatile Node left, right;
  *
- *   private static final AtomicReferenceFieldUpdater&lt;Node, Node&gt; leftUpdater =
+ *   private static final AtomicReferenceFieldUpdater<Node, Node> leftUpdater =
  *     AtomicReferenceFieldUpdater.newUpdater(Node.class, Node.class, "left");
- *   private static AtomicReferenceFieldUpdater&lt;Node, Node&gt; rightUpdater =
+ *   private static AtomicReferenceFieldUpdater<Node, Node> rightUpdater =
  *     AtomicReferenceFieldUpdater.newUpdater(Node.class, Node.class, "right");
  *
  *   Node getLeft() { return left;  }
@@ -34,8 +31,7 @@ import sun.misc.Unsafe;
  *     return leftUpdater.compareAndSet(this, expect, update);
  *   }
  *   // ... and so on
- * }
- * </pre>
+ * }}</pre>
  *
  * <p>Note that the guarantees of the {@code compareAndSet}
  * method in this class are weaker than in other atomic classes.
@@ -49,7 +45,7 @@ import sun.misc.Unsafe;
  * @param <T> The type of the object holding the updatable field
  * @param <V> The type of the field
  */
-public abstract class AtomicReferenceFieldUpdater<T, V>  {
+public abstract class AtomicReferenceFieldUpdater<T, V> {
 
     /**
      * Creates and returns an updater for objects with the given field.
@@ -159,7 +155,7 @@ public abstract class AtomicReferenceFieldUpdater<T, V>  {
         private final long offset;
         private final Class<T> tclass;
         private final Class<V> vclass;
-        private final Class cclass;
+        private final Class<?> cclass;
 
         /*
          * Internal type checks within all update methods contain
@@ -177,22 +173,13 @@ public abstract class AtomicReferenceFieldUpdater<T, V>  {
                                         Class<V> vclass,
                                         String fieldName) {
             Field field = null;
-            Class fieldClass = null;
-            Class caller = null;
+            Class<?> fieldClass = null;
+            Class<?> caller = null;
             int modifiers = 0;
             try {
                 field = tclass.getDeclaredField(fieldName);
                 caller = VMStack.getStackClass2(); // android-changed
                 modifiers = field.getModifiers();
-                // BEGIN android-added
-                SecurityManager smgr = System.getSecurityManager();
-                if (smgr != null) {
-                    int type = Modifier.isPublic(modifiers)
-                            ? Member.PUBLIC : Member.DECLARED;
-                    smgr.checkMemberAccess(tclass, type);
-                    smgr.checkPackageAccess(tclass.getPackage().getName());
-                }
-                // END android-added
                 // BEGIN android-removed
                 // sun.reflect.misc.ReflectUtil.ensureMemberAccess(
                 //     caller, tclass, null, modifiers);
@@ -277,7 +264,7 @@ public abstract class AtomicReferenceFieldUpdater<T, V>  {
             if (cclass.isInstance(obj)) {
                 return;
             }
-            throw new RuntimeException (
+            throw new RuntimeException(
                 new IllegalAccessException("Class " +
                     cclass.getName() +
                     " can not access a protected member of class " +

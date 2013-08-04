@@ -1,16 +1,14 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent.atomic;
 
-import dalvik.system.VMStack;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Modifier;
+import dalvik.system.VMStack; // android-added
 import sun.misc.Unsafe;
+import java.lang.reflect.*;
 
 /**
  * A reflection-based utility that enables atomic updates to
@@ -30,7 +28,7 @@ import sun.misc.Unsafe;
  * @author Doug Lea
  * @param <T> The type of the object holding the updatable field
  */
-public abstract class  AtomicIntegerFieldUpdater<T>  {
+public abstract class  AtomicIntegerFieldUpdater<T> {
     /**
      * Creates and returns an updater for objects with the given field.
      * The Class argument is needed to check that reflective types and
@@ -238,33 +236,21 @@ public abstract class  AtomicIntegerFieldUpdater<T>  {
      * Standard hotspot implementation using intrinsics
      */
     private static class AtomicIntegerFieldUpdaterImpl<T> extends AtomicIntegerFieldUpdater<T> {
-        private static final Unsafe unsafe = UnsafeAccess.THE_ONE; // android-changed
+        private static final Unsafe unsafe = Unsafe.getUnsafe();
         private final long offset;
         private final Class<T> tclass;
-        private final Class cclass;
+        private final Class<?> cclass;
 
         AtomicIntegerFieldUpdaterImpl(Class<T> tclass, String fieldName) {
             Field field = null;
-            Class caller = null;
+            Class<?> caller = null;
             int modifiers = 0;
             try {
                 field = tclass.getDeclaredField(fieldName);
-                // BEGIN android-changed
-                caller = VMStack.getStackClass2();
-                // END android-changed
+                caller = VMStack.getStackClass2(); // android-changed
                 modifiers = field.getModifiers();
 
-                // BEGIN android-added
-                SecurityManager smgr = System.getSecurityManager();
-                if (smgr != null) {
-                    int type = Modifier.isPublic(modifiers)
-                            ? Member.PUBLIC : Member.DECLARED;
-                    smgr.checkMemberAccess(tclass, type);
-                    smgr.checkPackageAccess(tclass.getPackage().getName());
-                }
-                // END android-added
                 // BEGIN android-removed
-                // modifiers = field.getModifiers();
                 // sun.reflect.misc.ReflectUtil.ensureMemberAccess(
                 //     caller, tclass, null, modifiers);
                 // sun.reflect.misc.ReflectUtil.checkPackageAccess(tclass);
@@ -273,7 +259,7 @@ public abstract class  AtomicIntegerFieldUpdater<T>  {
                 throw new RuntimeException(ex);
             }
 
-            Class fieldt = field.getType();
+            Class<?> fieldt = field.getType();
             if (fieldt != int.class)
                 throw new IllegalArgumentException("Must be integer type");
 

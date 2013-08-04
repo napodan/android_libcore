@@ -1,22 +1,22 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent;
 
-// BEGIN android-note
-// removed link to collections framework docs
-// END android-note
-
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.AbstractQueue;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+
+// BEGIN android-note
+// removed link to collections framework docs
+// END android-note
 
 /**
  * An optionally-bounded {@linkplain BlockingQueue blocking queue} based on
@@ -106,13 +106,13 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     private final int capacity;
 
     /** Current number of elements */
-    private final AtomicInteger count = new AtomicInteger(0);
+    private final AtomicInteger count = new AtomicInteger();
 
     /**
      * Head of linked list.
      * Invariant: head.item == null
      */
-    private transient Node<E> head;
+    transient Node<E> head;
 
     /**
      * Tail of linked list.
@@ -160,14 +160,14 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     }
 
     /**
-     * Creates a node and links it at end of queue.
+     * Links node at end of queue.
      *
-     * @param x the item
+     * @param node the node
      */
-    private void enqueue(E x) {
+    private void enqueue(Node<E> node) {
         // assert putLock.isHeldByCurrentThread();
         // assert last.next == null;
-        last = last.next = new Node<E>(x);
+        last = last.next = node;
     }
 
     /**
@@ -253,7 +253,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
                     throw new NullPointerException();
                 if (n == capacity)
                     throw new IllegalStateException("Queue full");
-                enqueue(e);
+                enqueue(new Node<E>(e));
                 ++n;
             }
             count.set(n);
@@ -303,6 +303,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
         // Note: convention in all put/take/etc is to preset local var
         // holding count negative to indicate failure unless set.
         int c = -1;
+        Node<E> node = new Node<E>(e);
         final ReentrantLock putLock = this.putLock;
         final AtomicInteger count = this.count;
         putLock.lockInterruptibly();
@@ -318,7 +319,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
             while (count.get() == capacity) {
                 notFull.await();
             }
-            enqueue(e);
+            enqueue(node);
             c = count.getAndIncrement();
             if (c + 1 < capacity)
                 notFull.signal();
@@ -353,7 +354,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
                     return false;
                 nanos = notFull.awaitNanos(nanos);
             }
-            enqueue(e);
+            enqueue(new Node<E>(e));
             c = count.getAndIncrement();
             if (c + 1 < capacity)
                 notFull.signal();
@@ -382,11 +383,12 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
         if (count.get() == capacity)
             return false;
         int c = -1;
+        Node<E> node = new Node<E>(e);
         final ReentrantLock putLock = this.putLock;
         putLock.lock();
         try {
             if (count.get() < capacity) {
-                enqueue(e);
+                enqueue(node);
                 c = count.getAndIncrement();
                 if (c + 1 < capacity)
                     notFull.signal();
@@ -531,6 +533,27 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     }
 
     /**
+     * Returns {@code true} if this queue contains the specified element.
+     * More formally, returns {@code true} if and only if this queue contains
+     * at least one element {@code e} such that {@code o.equals(e)}.
+     *
+     * @param o object to be checked for containment in this queue
+     * @return {@code true} if this queue contains the specified element
+     */
+    public boolean contains(Object o) {
+        if (o == null) return false;
+        fullyLock();
+        try {
+            for (Node<E> p = head.next; p != null; p = p.next)
+                if (o.equals(p.item))
+                    return true;
+            return false;
+        } finally {
+            fullyUnlock();
+        }
+    }
+
+    /**
      * Returns an array containing all of the elements in this queue, in
      * proper sequence.
      *
@@ -578,8 +601,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
      * The following code can be used to dump the queue into a newly
      * allocated array of {@code String}:
      *
-     * <pre>
-     *     String[] y = x.toArray(new String[0]);</pre>
+     *  <pre> {@code String[] y = x.toArray(new String[0]);}</pre>
      *
      * Note that {@code toArray(new Object[0])} is identical in function to
      * {@code toArray()}.
@@ -616,7 +638,20 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     public String toString() {
         fullyLock();
         try {
-            return super.toString();
+            Node<E> p = head.next;
+            if (p == null)
+                return "[]";
+
+            StringBuilder sb = new StringBuilder();
+            sb.append('[');
+            for (;;) {
+                E e = p.item;
+                sb.append(e == this ? "(this Collection)" : e);
+                p = p.next;
+                if (p == null)
+                    return sb.append(']').toString();
+                sb.append(',').append(' ');
+            }
         } finally {
             fullyUnlock();
         }
@@ -663,6 +698,8 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
             throw new NullPointerException();
         if (c == this)
             throw new IllegalArgumentException();
+        if (maxElements <= 0)
+            return 0;
         boolean signalNotFull = false;
         final ReentrantLock takeLock = this.takeLock;
         takeLock.lock();
@@ -698,17 +735,19 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
 
     /**
      * Returns an iterator over the elements in this queue in proper sequence.
-     * The returned {@code Iterator} is a "weakly consistent" iterator that
+     * The elements will be returned in order from first (head) to last (tail).
+     *
+     * <p>The returned iterator is a "weakly consistent" iterator that
      * will never throw {@link java.util.ConcurrentModificationException
-     * ConcurrentModificationException},
-     * and guarantees to traverse elements as they existed upon
-     * construction of the iterator, and may (but is not guaranteed to)
-     * reflect any modifications subsequent to construction.
+     * ConcurrentModificationException}, and guarantees to traverse
+     * elements as they existed upon construction of the iterator, and
+     * may (but is not guaranteed to) reflect any modifications
+     * subsequent to construction.
      *
      * @return an iterator over the elements in this queue in proper sequence
      */
     public Iterator<E> iterator() {
-      return new Itr();
+        return new Itr();
     }
 
     private class Itr implements Iterator<E> {
@@ -791,7 +830,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     }
 
     /**
-     * Save the state to a stream (that is, serialize it).
+     * Saves the state to a stream (that is, serializes it).
      *
      * @serialData The capacity is emitted (int), followed by all of
      * its elements (each an {@code Object}) in the proper order,
@@ -818,8 +857,7 @@ public class LinkedBlockingQueue<E> extends AbstractQueue<E>
     }
 
     /**
-     * Reconstitute this queue instance from a stream (that is,
-     * deserialize it).
+     * Reconstitutes this queue from a stream (that is, deserializes it).
      *
      * @param s the stream
      */

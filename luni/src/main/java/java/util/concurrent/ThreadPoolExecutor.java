@@ -1,20 +1,17 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent;
+import java.util.concurrent.locks.*;
+import java.util.concurrent.atomic.*;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.AbstractQueuedSynchronizer;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+// BEGIN android-note
+// removed security manager docs
+// END android-note
 
 /**
  * An {@link ExecutorService} that executes each submitted task using
@@ -82,12 +79,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * alter the thread's name, thread group, priority, daemon status,
  * etc. If a {@code ThreadFactory} fails to create a thread when asked
  * by returning null from {@code newThread}, the executor will
- * continue, but might not be able to execute any tasks. Threads
- * should possess the "modifyThread" {@code RuntimePermission}. If
- * worker threads or other threads using the pool do not possess this
- * permission, service may be degraded: configuration changes may not
- * take effect in a timely manner, and a shutdown pool may remain in a
- * state in which termination is possible but not completed.</dd>
+ * continue, but might not be able to execute any tasks.</dd>
  *
  * <dt>Keep-alive times</dt>
  *
@@ -1323,8 +1315,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * <p>This method does not wait for previously submitted tasks to
      * complete execution.  Use {@link #awaitTermination awaitTermination}
      * to do that.
-     *
-     * @throws SecurityException {@inheritDoc}
      */
     public void shutdown() {
         final ReentrantLock mainLock = this.mainLock;
@@ -1354,8 +1344,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * processing actively executing tasks.  This implementation
      * cancels tasks via {@link Thread#interrupt}, so any task that
      * fails to respond to interrupts may never terminate.
-     *
-     * @throws SecurityException {@inheritDoc}
      */
     public List<Runnable> shutdownNow() {
         List<Runnable> tasks;
@@ -1419,16 +1407,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * Invokes {@code shutdown} when this executor is no longer
      * referenced and it has no threads.
      */
-    @Override protected void finalize() {
-        try {
-            shutdown();
-        } finally {
-            try {
-                super.finalize();
-            } catch (Throwable t) {
-                throw new AssertionError(t);
-            }
-        }
+    protected void finalize() {
+        shutdown();
     }
 
     /**
@@ -1529,6 +1509,18 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     public boolean prestartCoreThread() {
         return workerCountOf(ctl.get()) < corePoolSize &&
             addWorker(null, true);
+    }
+
+    /**
+     * Same as prestartCoreThread except arranges that at least one
+     * thread is started even if corePoolSize is 0.
+     */
+    void ensurePrestart() {
+        int wc = workerCountOf(ctl.get());
+        if (wc < corePoolSize)
+            addWorker(null, true);
+        else if (wc == 0)
+            addWorker(null, false);
     }
 
     /**
@@ -1827,6 +1819,43 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         }
     }
 
+    /**
+     * Returns a string identifying this pool, as well as its state,
+     * including indications of run state and estimated worker and
+     * task counts.
+     *
+     * @return a string identifying this pool, as well as its state
+     */
+    public String toString() {
+        long ncompleted;
+        int nworkers, nactive;
+        final ReentrantLock mainLock = this.mainLock;
+        mainLock.lock();
+        try {
+            ncompleted = completedTaskCount;
+            nactive = 0;
+            nworkers = workers.size();
+            for (Worker w : workers) {
+                ncompleted += w.completedTasks;
+                if (w.isLocked())
+                    ++nactive;
+            }
+        } finally {
+            mainLock.unlock();
+        }
+        int c = ctl.get();
+        String rs = (runStateLessThan(c, SHUTDOWN) ? "Running" :
+                     (runStateAtLeast(c, TERMINATED) ? "Terminated" :
+                      "Shutting down"));
+        return super.toString() +
+            "[" + rs +
+            ", pool size = " + nworkers +
+            ", active threads = " + nactive +
+            ", queued tasks = " + workQueue.size() +
+            ", completed tasks = " + ncompleted +
+            "]";
+    }
+
     /* Extension hooks */
 
     /**
@@ -1947,20 +1976,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          * @throws RejectedExecutionException always.
          */
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            // BEGIN android-changed
-            //     provide diagnostic messaging for a common exception
-
-            // a message is helpful even if it isn't created atomically
-            int queueSize = e.getQueue().size();
-            int remainingCapacity = e.getQueue().remainingCapacity();
-            String message = "pool=" + e.getPoolSize() + "/" + e.maximumPoolSize
-                    + ", queue=" + queueSize;
-            if (remainingCapacity != Integer.MAX_VALUE) {
-                message += "/" + (queueSize + remainingCapacity);
-            }
-            throw new RejectedExecutionException(message);
-
-            // END android-changed
+            throw new RejectedExecutionException("Task " + r.toString() +
+                                                 " rejected from " +
+                                                 e.toString());
         }
     }
 

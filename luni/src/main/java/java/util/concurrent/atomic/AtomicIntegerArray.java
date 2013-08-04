@@ -1,11 +1,10 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent.atomic;
-
 import sun.misc.Unsafe;
 
 /**
@@ -19,10 +18,17 @@ import sun.misc.Unsafe;
 public class AtomicIntegerArray implements java.io.Serializable {
     private static final long serialVersionUID = 2862133569453604235L;
 
-    private static final Unsafe unsafe = UnsafeAccess.THE_ONE; // android-changed
+    private static final Unsafe unsafe = Unsafe.getUnsafe();
     private static final int base = unsafe.arrayBaseOffset(int[].class);
-    private static final int scale = unsafe.arrayIndexScale(int[].class);
+    private static final int shift;
     private final int[] array;
+
+    static {
+        int scale = unsafe.arrayIndexScale(int[].class);
+        if ((scale & (scale - 1)) != 0)
+            throw new Error("data type scale not a power of two");
+        shift = 31 - Integer.numberOfLeadingZeros(scale);
+    }
 
     private long checkedByteOffset(int i) {
         if (i < 0 || i >= array.length)
@@ -32,7 +38,7 @@ public class AtomicIntegerArray implements java.io.Serializable {
     }
 
     private static long byteOffset(int i) {
-        return base + (long) i * scale;
+        return ((long) i << shift) + base;
     }
 
     /**
@@ -241,7 +247,7 @@ public class AtomicIntegerArray implements java.io.Serializable {
             b.append(getRaw(byteOffset(i)));
             if (i == iMax)
                 return b.append(']').toString();
-            b.append(", ");
+            b.append(',').append(' ');
         }
     }
 

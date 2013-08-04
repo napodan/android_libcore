@@ -1,7 +1,7 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent;
@@ -27,60 +27,60 @@ package java.util.concurrent;
  * executor can run the submitted task immediately in the caller's
  * thread:
  *
- * <pre>
+ *  <pre> {@code
  * class DirectExecutor implements Executor {
- *     public void execute(Runnable r) {
- *         r.run();
- *     }
- * }</pre>
+ *   public void execute(Runnable r) {
+ *     r.run();
+ *   }
+ * }}</pre>
  *
  * More typically, tasks are executed in some thread other
  * than the caller's thread.  The executor below spawns a new thread
  * for each task.
  *
- * <pre>
+ *  <pre> {@code
  * class ThreadPerTaskExecutor implements Executor {
- *     public void execute(Runnable r) {
- *         new Thread(r).start();
- *     }
- * }</pre>
+ *   public void execute(Runnable r) {
+ *     new Thread(r).start();
+ *   }
+ * }}</pre>
  *
  * Many <tt>Executor</tt> implementations impose some sort of
  * limitation on how and when tasks are scheduled.  The executor below
  * serializes the submission of tasks to a second executor,
  * illustrating a composite executor.
  *
- * <pre>
+ *  <pre> {@code
  * class SerialExecutor implements Executor {
- *     final Queue&lt;Runnable&gt; tasks = new ArrayDeque&lt;Runnable&gt;();
- *     final Executor executor;
- *     Runnable active;
+ *   final Queue<Runnable> tasks = new ArrayDeque<Runnable>();
+ *   final Executor executor;
+ *   Runnable active;
  *
- *     SerialExecutor(Executor executor) {
- *         this.executor = executor;
- *     }
+ *   SerialExecutor(Executor executor) {
+ *     this.executor = executor;
+ *   }
  *
- *     public synchronized void execute(final Runnable r) {
- *         tasks.offer(new Runnable() {
- *             public void run() {
- *                 try {
- *                     r.run();
- *                 } finally {
- *                     scheduleNext();
- *                 }
- *             }
- *         });
- *         if (active == null) {
- *             scheduleNext();
+ *   public synchronized void execute(final Runnable r) {
+ *     tasks.offer(new Runnable() {
+ *       public void run() {
+ *         try {
+ *           r.run();
+ *         } finally {
+ *           scheduleNext();
  *         }
+ *       }
+ *     });
+ *     if (active == null) {
+ *       scheduleNext();
  *     }
+ *   }
  *
- *     protected synchronized void scheduleNext() {
- *         if ((active = tasks.poll()) != null) {
- *             executor.execute(active);
- *         }
+ *   protected synchronized void scheduleNext() {
+ *     if ((active = tasks.poll()) != null) {
+ *       executor.execute(active);
  *     }
- * }</pre>
+ *   }
+ * }}</pre>
  *
  * The <tt>Executor</tt> implementations provided in this package
  * implement {@link ExecutorService}, which is a more extensive

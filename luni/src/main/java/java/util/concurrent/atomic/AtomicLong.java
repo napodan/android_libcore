@@ -1,7 +1,7 @@
 /*
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent.atomic;
@@ -24,7 +24,7 @@ public class AtomicLong extends Number implements java.io.Serializable {
     private static final long serialVersionUID = 1927816293512124184L;
 
     // setup to use Unsafe.compareAndSwapLong for updates
-    private static final Unsafe unsafe = UnsafeAccess.THE_ONE; // android-changed
+    private static final Unsafe unsafe = Unsafe.getUnsafe();
     private static final long valueOffset;
 
     /**
@@ -32,10 +32,8 @@ public class AtomicLong extends Number implements java.io.Serializable {
      * compareAndSwap for longs. While the Unsafe.compareAndSwapLong
      * method works in either case, some constructions should be
      * handled at Java level to avoid locking user-visible locks.
-     *
-     * Initialised in the static block.
      */
-    static final boolean VM_SUPPORTS_LONG_CAS;
+    static final boolean VM_SUPPORTS_LONG_CAS = VMSupportsCS8();
 
     /**
      * Returns whether underlying JVM supports lockless CompareAndSet
@@ -44,19 +42,10 @@ public class AtomicLong extends Number implements java.io.Serializable {
     private static native boolean VMSupportsCS8();
 
     static {
-      try {
-        valueOffset = unsafe.objectFieldOffset
-            (AtomicLong.class.getDeclaredField("value"));
-      } catch (Exception ex) { throw new Error(ex); }
-
-      boolean longCASSupport;
-      try {
-         longCASSupport = VMSupportsCS8();
-      } catch (UnsatisfiedLinkError e) {
-         // assume there's support if the native isn't provided by the VM
-         longCASSupport = true;
-      }
-      VM_SUPPORTS_LONG_CAS = longCASSupport;
+        try {
+            valueOffset = unsafe.objectFieldOffset
+                (AtomicLong.class.getDeclaredField("value"));
+        } catch (Exception ex) { throw new Error(ex); }
     }
 
     private volatile long value;
@@ -242,18 +231,33 @@ public class AtomicLong extends Number implements java.io.Serializable {
     }
 
 
+    /**
+     * Returns the value of this {@code AtomicLong} as an {@code int}
+     * after a narrowing primitive conversion.
+     */
     public int intValue() {
         return (int)get();
     }
 
+    /**
+     * Returns the value of this {@code AtomicLong} as a {@code long}.
+     */
     public long longValue() {
         return get();
     }
 
+    /**
+     * Returns the value of this {@code AtomicLong} as a {@code float}
+     * after a widening primitive conversion.
+     */
     public float floatValue() {
         return (float)get();
     }
 
+    /**
+     * Returns the value of this {@code AtomicLong} as a {@code double}
+     * after a widening primitive conversion.
+     */
     public double doubleValue() {
         return (double)get();
     }

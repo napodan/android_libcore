@@ -2,13 +2,11 @@
  * Written by Doug Lea, Bill Scherer, and Michael Scott with
  * assistance from members of JCP JSR-166 Expert Group and released to
  * the public domain, as explained at
- * http://creativecommons.org/licenses/publicdomain
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
 package java.util.concurrent;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -25,7 +23,7 @@ import java.util.concurrent.locks.LockSupport;
  * to swap buffers between threads so that the thread filling the
  * buffer gets a freshly emptied one when it needs it, handing off the
  * filled one to the thread emptying the buffer.
- * <pre>{@code
+ *  <pre> {@code
  * class FillAndEmpty {
  *   Exchanger<DataBuffer> exchanger = new Exchanger<DataBuffer>();
  *   DataBuffer initialEmptyBuffer = ... a made-up type
@@ -61,8 +59,7 @@ import java.util.concurrent.locks.LockSupport;
  *     new Thread(new FillingLoop()).start();
  *     new Thread(new EmptyingLoop()).start();
  *   }
- * }
- * }</pre>
+ * }}</pre>
  *
  * <p>Memory consistency effects: For each pair of threads that
  * successfully exchange objects via an {@code Exchanger}, actions
@@ -137,8 +134,8 @@ public class Exchanger<V> {
      * races between two threads or thread pre-emptions occurring
      * between reading and CASing.  Also, very transient peak
      * contention can be much higher than the average sustainable
-     * levels.  The max limit is decreased on average 50% of the times
-     * that a non-slot-zero wait elapses without being fulfilled.
+     * levels.  An attempt to decrease the max limit is usually made
+     * when a non-slot-zero wait elapses without being fulfilled.
      * Threads experiencing elapsed waits move closer to zero, so
      * eventually find existing (or future) threads even if the table
      * has been shrunk due to inactivity.  The chosen mechanics and
@@ -277,7 +274,9 @@ public class Exchanger<V> {
      * extra space.
      */
     private static final class Slot extends AtomicReference<Object> {
-        // Improve likelihood of isolation on <= 64 byte cache lines
+        // Improve likelihood of isolation on <= 128 byte cache lines.
+        // We used to target 64 byte cache lines, but some x86s (including
+        // i7 under some BIOSes) actually use 128 byte cache lines.
         long q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, qa, qb, qc, qd, qe;
     }
 
@@ -328,7 +327,9 @@ public class Exchanger<V> {
             else if (y == null &&                 // Try to occupy
                      slot.compareAndSet(null, me)) {
                 if (index == 0)                   // Blocking wait for slot 0
-                    return timed? awaitNanos(me, slot, nanos): await(me, slot);
+                    return timed ?
+                        awaitNanos(me, slot, nanos) :
+                        await(me, slot);
                 Object v = spinWait(me, slot);    // Spin wait for non-0
                 if (v != CANCEL)
                     return v;
@@ -570,8 +571,8 @@ public class Exchanger<V> {
      * dormant until one of two things happens:
      * <ul>
      * <li>Some other thread enters the exchange; or
-     * <li>Some other thread {@linkplain Thread#interrupt interrupts} the current
-     * thread.
+     * <li>Some other thread {@linkplain Thread#interrupt interrupts}
+     * the current thread.
      * </ul>
      * <p>If the current thread:
      * <ul>
@@ -589,7 +590,7 @@ public class Exchanger<V> {
      */
     public V exchange(V x) throws InterruptedException {
         if (!Thread.interrupted()) {
-            Object v = doExchange(x == null? NULL_ITEM : x, false, 0);
+            Object v = doExchange((x == null) ? NULL_ITEM : x, false, 0);
             if (v == NULL_ITEM)
                 return null;
             if (v != CANCEL)
@@ -644,7 +645,7 @@ public class Exchanger<V> {
     public V exchange(V x, long timeout, TimeUnit unit)
         throws InterruptedException, TimeoutException {
         if (!Thread.interrupted()) {
-            Object v = doExchange(x == null? NULL_ITEM : x,
+            Object v = doExchange((x == null) ? NULL_ITEM : x,
                                   true, unit.toNanos(timeout));
             if (v == NULL_ITEM)
                 return null;
