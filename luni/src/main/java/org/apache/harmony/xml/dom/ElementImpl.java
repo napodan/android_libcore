@@ -18,6 +18,7 @@ package org.apache.harmony.xml.dom;
 
 import java.util.ArrayList;
 import java.util.List;
+import libcore.util.Objects;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
@@ -52,30 +53,13 @@ public class ElementImpl extends InnerNodeImpl implements Element {
 
     ElementImpl(DocumentImpl document, String name) {
         super(document);
-
-        this.namespaceAware = false;
-
-        int p = name.lastIndexOf(":");
-        if (p != -1) {
-            String prefix = name.substring(0, p);
-            String localName = name.substring(p + 1);
-
-            if (!DocumentImpl.isXMLIdentifier(prefix) || !DocumentImpl.isXMLIdentifier(localName)) {
-                throw new DOMException(DOMException.INVALID_CHARACTER_ERR, name);
-            }
-        } else {
-            if (!DocumentImpl.isXMLIdentifier(name)) {
-                throw new DOMException(DOMException.INVALID_CHARACTER_ERR, name);
-            }
-        }
-
-        this.localName = name;
+        setName(this, name);
     }
 
     private int indexOfAttribute(String name) {
         for (int i = 0; i < attributes.size(); i++) {
             AttrImpl attr = attributes.get(i);
-            if (attr.matchesName(name, false)) {
+            if (Objects.equal(name, attr.getNodeName())) {
                 return i;
             }
         }
@@ -86,7 +70,8 @@ public class ElementImpl extends InnerNodeImpl implements Element {
     private int indexOfAttributeNS(String namespaceURI, String localName) {
         for (int i = 0; i < attributes.size(); i++) {
             AttrImpl attr = attributes.get(i);
-            if (attr.matchesNameNS(namespaceURI, localName, false)) {
+            if (Objects.equal(namespaceURI, attr.getNamespaceURI())
+                    && Objects.equal(localName, attr.getLocalName())) {
                 return i;
             }
         }
@@ -174,41 +159,15 @@ public class ElementImpl extends InnerNodeImpl implements Element {
     }
 
     public NodeList getElementsByTagName(String name) {
-        NodeListImpl list = new NodeListImpl();
-        getElementsByTagName(list, name);
-        return list;
-    }
-
-    void getElementsByTagName(NodeListImpl list, String name) {
-        if (matchesName(name, true)) {
-            list.add(this);
-        }
-
-        for (NodeImpl node : children) {
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                ((ElementImpl) node).getElementsByTagName(list, name);
-            }
-        }
+        NodeListImpl result = new NodeListImpl();
+        getElementsByTagName(result, name);
+        return result;
     }
 
     public NodeList getElementsByTagNameNS(String namespaceURI, String localName) {
-        NodeListImpl list = new NodeListImpl();
-        getElementsByTagNameNS(list, namespaceURI, localName);
-        return list;
-    }
-
-    void getElementsByTagNameNS(NodeListImpl list, String namespaceURI,
-            String localName) {
-        if (matchesNameNS(namespaceURI, localName, true)) {
-            list.add(this);
-        }
-
-        for (NodeImpl node : children) {
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                ((ElementImpl) node).getElementsByTagNameNS(list, namespaceURI,
-                        localName);
-            }
-        }
+        NodeListImpl result = new NodeListImpl();
+        getElementsByTagNameNS(result, namespaceURI, localName);
+        return result;
     }
 
     @Override

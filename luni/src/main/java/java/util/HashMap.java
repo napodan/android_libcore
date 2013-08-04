@@ -15,10 +15,6 @@
  *  limitations under the License.
  */
 
-// BEGIN android-note
-// Completely different implementation from harmony.  Runs much faster.
-// BEGIN android-note
-
 package java.util;
 
 import java.io.IOException;
@@ -27,7 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamField;
 import java.io.Serializable;
-import libcore.base.Objects;
+import libcore.util.Objects;
 
 /**
  * HashMap is an implementation of {@link Map}. All optional operations are supported.
@@ -157,7 +153,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
         } else if (capacity > MAXIMUM_CAPACITY) {
             capacity = MAXIMUM_CAPACITY;
         } else {
-            capacity = roundUpToPowerOfTwo(capacity);
+            capacity = Collections.roundUpToPowerOfTwo(capacity);
         }
         makeTable(capacity);
     }
@@ -206,6 +202,9 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
      * readObject). Also used by LinkedHashMap.
      */
     final void constructorPutAll(Map<? extends K, ? extends V> map) {
+        if (table == EMPTY_TABLE) {
+            doubleCapacity(); // Don't do unchecked puts to a shared table.
+        }
         for (Entry<? extends K, ? extends V> e : map.entrySet()) {
             constructorPut(e.getKey(), e.getValue());
         }
@@ -298,7 +297,8 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
             return e == null ? null : e.value;
         }
 
-        // Doug Lea's supplemental secondaryHash function (inlined)
+        // Doug Lea's supplemental secondaryHash function (inlined).
+        // Replace with Collections.secondaryHash when the VM is fast enough (http://b/8290590).
         int hash = key.hashCode();
         hash ^= (hash >>> 20) ^ (hash >>> 12);
         hash ^= (hash >>> 7) ^ (hash >>> 4);
@@ -327,7 +327,8 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
             return entryForNullKey != null;
         }
 
-        // Doug Lea's supplemental secondaryHash function (inlined)
+        // Doug Lea's supplemental secondaryHash function (inlined).
+        // Replace with Collections.secondaryHash when the VM is fast enough (http://b/8290590).
         int hash = key.hashCode();
         hash ^= (hash >>> 20) ^ (hash >>> 12);
         hash ^= (hash >>> 7) ^ (hash >>> 4);
@@ -341,6 +342,15 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
             }
         }
         return false;
+    }
+
+    // Doug Lea's supplemental secondaryHash function (non-inlined).
+    // Replace with Collections.secondaryHash when the VM is fast enough (http://b/8290590).
+    static int secondaryHash(Object key) {
+        int hash = key.hashCode();
+        hash ^= (hash >>> 20) ^ (hash >>> 12);
+        hash ^= (hash >>> 7) ^ (hash >>> 4);
+        return hash;
     }
 
     /**
@@ -391,7 +401,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
             return putValueForNullKey(value);
         }
 
-        int hash = secondaryHash(key.hashCode());
+        int hash = secondaryHash(key);
         HashMapEntry<K, V>[] tab = table;
         int index = hash & (tab.length - 1);
         for (HashMapEntry<K, V> e = tab[index]; e != null; e = e.next) {
@@ -454,7 +464,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
             return;
         }
 
-        int hash = secondaryHash(key.hashCode());
+        int hash = secondaryHash(key);
         HashMapEntry<K, V>[] tab = table;
         int index = hash & (tab.length - 1);
         HashMapEntry<K, V> first = tab[index];
@@ -523,13 +533,13 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
      *  <p>This method is called only by putAll.
      */
     private void ensureCapacity(int numMappings) {
-        int newCapacity = roundUpToPowerOfTwo(capacityForInitSize(numMappings));
+        int newCapacity = Collections.roundUpToPowerOfTwo(capacityForInitSize(numMappings));
         HashMapEntry<K, V>[] oldTable = table;
         int oldCapacity = oldTable.length;
         if (newCapacity <= oldCapacity) {
             return;
         }
-        if (newCapacity == oldCapacity << 1) {
+        if (newCapacity == oldCapacity * 2) {
             doubleCapacity();
             return;
         }
@@ -575,7 +585,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
         if (oldCapacity == MAXIMUM_CAPACITY) {
             return oldTable;
         }
-        int newCapacity = oldCapacity << 1;
+        int newCapacity = oldCapacity * 2;
         HashMapEntry<K, V>[] newTable = makeTable(newCapacity);
         if (size == 0) {
             return newTable;
@@ -622,7 +632,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
         if (key == null) {
             return removeNullKey();
         }
-        int hash = secondaryHash(key.hashCode());
+        int hash = secondaryHash(key);
         HashMapEntry<K, V>[] tab = table;
         int index = hash & (tab.length - 1);
         for (HashMapEntry<K, V> e = tab[index], prev = null;
@@ -842,7 +852,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
             return e != null && Objects.equal(value, e.value);
         }
 
-        int hash = secondaryHash(key.hashCode());
+        int hash = secondaryHash(key);
         HashMapEntry<K, V>[] tab = table;
         int index = hash & (tab.length - 1);
         for (HashMapEntry<K, V> e = tab[index]; e != null; e = e.next) {
@@ -870,7 +880,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
             return true;
         }
 
-        int hash = secondaryHash(key.hashCode());
+        int hash = secondaryHash(key);
         HashMapEntry<K, V>[] tab = table;
         int index = hash & (tab.length - 1);
         for (HashMapEntry<K, V> e = tab[index], prev = null;
@@ -966,48 +976,10 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
         }
     }
 
-    /**
-     * Applies a supplemental hash function to a given hashCode, which defends
-     * against poor quality hash functions. This is critical because HashMap
-     * uses power-of-two length hash tables, that otherwise encounter collisions
-     * for hashCodes that do not differ in lower or upper bits.
-     */
-    private static int secondaryHash(int h) {
-        // Doug Lea's supplemental hash function
-        h ^= (h >>> 20) ^ (h >>> 12);
-        return h ^ (h >>> 7) ^ (h >>> 4);
-    }
-
-    /**
-     * Returns the smallest power of two >= its argument, with several caveats:
-     * If the argument is negative but not Integer.MIN_VALUE, the method returns
-     * zero. If the argument is > 2^30 or equal to Integer.MIN_VALUE, the method
-     * returns Integer.MIN_VALUE. If the argument is zero, the method returns
-     * zero.
-     */
-    private static int roundUpToPowerOfTwo(int i) {
-        i--; // If input is a power of two, shift its high-order bit right
-
-        // "Smear" the high-order bit all the way to the right
-        i |= i >>>  1;
-        i |= i >>>  2;
-        i |= i >>>  4;
-        i |= i >>>  8;
-        i |= i >>> 16;
-
-        return i + 1;
-    }
-
     private static final long serialVersionUID = 362498820763181265L;
 
-    /**
-     * Serializable fields.
-     *
-     * @serialField loadFactor float
-     *              load factor for this HashMap
-     */
     private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("loadFactor", Float.TYPE)
+        new ObjectStreamField("loadFactor", float.class)
     };
 
     private void writeObject(ObjectOutputStream stream) throws IOException {
@@ -1036,7 +1008,7 @@ public class HashMap<K, V> extends AbstractMap<K, V> implements Cloneable, Seria
         } else if (capacity > MAXIMUM_CAPACITY) {
             capacity = MAXIMUM_CAPACITY;
         } else {
-            capacity = roundUpToPowerOfTwo(capacity);
+            capacity = Collections.roundUpToPowerOfTwo(capacity);
         }
         makeTable(capacity);
 

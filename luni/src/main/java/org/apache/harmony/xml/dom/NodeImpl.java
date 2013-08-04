@@ -16,12 +16,11 @@
 
 package org.apache.harmony.xml.dom;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.xml.transform.TransformerException;
-import org.apache.xml.serializer.utils.SystemIDResolver;
-import org.apache.xml.utils.URI;
 import org.w3c.dom.Attr;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.DOMException;
@@ -62,6 +61,10 @@ public abstract class NodeImpl implements Node {
         }
     };
 
+    /**
+     * The containing document. This is non-null except for DocumentTypeImpl
+     * nodes created by the DOMImplementation.
+     */
     DocumentImpl document;
 
     NodeImpl(DocumentImpl document) {
@@ -215,10 +218,10 @@ public abstract class NodeImpl implements Node {
     }
 
     /**
-     * Sets the element or attribute node to be namespace-aware and assign it
-     * the specified name and namespace URI.
+     * Sets {@code node} to be namespace-aware and assigns its namespace URI
+     * and qualified name.
      *
-     * @param node an AttrImpl or ElementImpl node.
+     * @param node an element or attribute node.
      * @param namespaceURI this node's namespace URI. May be null.
      * @param qualifiedName a possibly-prefixed name like "img" or "html:img".
      */
@@ -239,77 +242,67 @@ public abstract class NodeImpl implements Node {
         }
 
         switch (node.getNodeType()) {
-            case ATTRIBUTE_NODE:
-                if ("xmlns".equals(qualifiedName)
-                        && !"http://www.w3.org/2000/xmlns/".equals(namespaceURI)) {
-                    throw new DOMException(DOMException.NAMESPACE_ERR, qualifiedName);
-                }
+        case ATTRIBUTE_NODE:
+            if ("xmlns".equals(qualifiedName)
+                    && !"http://www.w3.org/2000/xmlns/".equals(namespaceURI)) {
+                throw new DOMException(DOMException.NAMESPACE_ERR, qualifiedName);
+            }
 
-                AttrImpl attr = (AttrImpl) node;
-                attr.namespaceAware = true;
-                attr.namespaceURI = namespaceURI;
-                attr.prefix = prefix;
-                attr.localName = qualifiedName;
-                break;
+            AttrImpl attr = (AttrImpl) node;
+            attr.namespaceAware = true;
+            attr.namespaceURI = namespaceURI;
+            attr.prefix = prefix;
+            attr.localName = qualifiedName;
+            break;
 
-            case ELEMENT_NODE:
-                ElementImpl element = (ElementImpl) node;
-                element.namespaceAware = true;
-                element.namespaceURI = namespaceURI;
-                element.prefix = prefix;
-                element.localName = qualifiedName;
-                break;
+        case ELEMENT_NODE:
+            ElementImpl element = (ElementImpl) node;
+            element.namespaceAware = true;
+            element.namespaceURI = namespaceURI;
+            element.prefix = prefix;
+            element.localName = qualifiedName;
+            break;
 
-            default:
-                throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
-                        "Cannot rename nodes of type " + node.getNodeType());
+        default:
+            throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+                    "Cannot rename nodes of type " + node.getNodeType());
         }
     }
 
     /**
-     * Checks whether a required string matches an actual string. This utility
-     * method is used for comparing namespaces and such. It takes into account
-     * null arguments and the "*" special case.
+     * Sets {@code node} to be not namespace-aware and assigns its name.
      *
-     * @param required The required string.
-     * @param actual The actual string.
-     * @return True if and only if the actual string matches the required one.
+     * @param node an element or attribute node.
      */
-    private static boolean matchesName(String required, String actual, boolean wildcard) {
-        if (wildcard && "*".equals(required)) {
-            return true;
+    static void setName(NodeImpl node, String name) {
+        int prefixSeparator = name.lastIndexOf(":");
+        if (prefixSeparator != -1) {
+            String prefix = name.substring(0, prefixSeparator);
+            String localName = name.substring(prefixSeparator + 1);
+            if (!DocumentImpl.isXMLIdentifier(prefix) || !DocumentImpl.isXMLIdentifier(localName)) {
+                throw new DOMException(DOMException.INVALID_CHARACTER_ERR, name);
+            }
+        } else if (!DocumentImpl.isXMLIdentifier(name)) {
+            throw new DOMException(DOMException.INVALID_CHARACTER_ERR, name);
         }
 
-        if (required == null) {
-            return (actual == null);
+        switch (node.getNodeType()) {
+        case ATTRIBUTE_NODE:
+            AttrImpl attr = (AttrImpl) node;
+            attr.namespaceAware = false;
+            attr.localName = name;
+            break;
+
+        case ELEMENT_NODE:
+            ElementImpl element = (ElementImpl) node;
+            element.namespaceAware = false;
+            element.localName = name;
+            break;
+
+        default:
+            throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+                    "Cannot rename nodes of type " + node.getNodeType());
         }
-
-        return required.equals(actual);
-    }
-
-    /**
-     * Checks whether this node's name matches a required name. It takes into
-     * account null arguments and the "*" special case.
-     *
-     * @param name The required name.
-     * @return True if and only if the actual name matches the required one.
-     */
-    public boolean matchesName(String name, boolean wildcard) {
-        return matchesName(name, getNodeName(), wildcard);
-    }
-
-    /**
-     * Checks whether this node's namespace and local name match a required
-     * pair of namespace and local name. It takes into account null arguments
-     * and the "*" special case.
-     *
-     * @param namespaceURI The required namespace.
-     * @param localName The required local name.
-     * @return True if and only if the actual namespace and local name match
-     *         the required pair of namespace and local name.
-     */
-    public boolean matchesNameNS(String namespaceURI, String localName, boolean wildcard) {
-        return matchesName(namespaceURI, getNamespaceURI(), wildcard) && matchesName(localName, getLocalName(), wildcard);
     }
 
     public final String getBaseURI() {
@@ -322,26 +315,27 @@ public abstract class NodeImpl implements Node {
                 String uri = element.getAttributeNS(
                         "http://www.w3.org/XML/1998/namespace", "base"); // or "xml:base"
 
-                // if this node has no base URI, return the parent's.
-                if (uri == null || uri.length() == 0) {
-                    return getParentBaseUri();
-                }
-
-                // if this node's URI is absolute, return that
-                if (SystemIDResolver.isAbsoluteURI(uri)) {
-                    return uri;
-                }
-
-                // this node has a relative URI. Try to resolve it against the
-                // parent, but if that doesn't work just give up and return null.
-                String parentUri = getParentBaseUri();
-                if (parentUri == null) {
-                    return null;
-                }
                 try {
-                    return SystemIDResolver.getAbsoluteURI(uri, parentUri);
-                } catch (TransformerException e) {
-                    return null; // the spec requires that we swallow exceptions
+                    // if this node has no base URI, return the parent's.
+                    if (uri == null || uri.isEmpty()) {
+                        return getParentBaseUri();
+                    }
+
+                    // if this node's URI is absolute, return it
+                    if (new URI(uri).isAbsolute()) {
+                        return uri;
+                    }
+
+                    // this node has a relative URI. Try to resolve it against the
+                    // parent, but if that doesn't work just give up and return null.
+                    String parentUri = getParentBaseUri();
+                    if (parentUri == null) {
+                        return null;
+                    }
+
+                    return new URI(parentUri).resolve(uri).toString();
+                } catch (URISyntaxException e) {
+                    return null;
                 }
 
             case PROCESSING_INSTRUCTION_NODE:
@@ -386,7 +380,7 @@ public abstract class NodeImpl implements Node {
         }
         try {
             return new URI(uri).toString();
-        } catch (URI.MalformedURIException e) {
+        } catch (URISyntaxException e) {
             return null;
         }
     }
@@ -703,7 +697,7 @@ public abstract class NodeImpl implements Node {
 
     public final Object setUserData(String key, Object data, UserDataHandler handler) {
         if (key == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("key == null");
         }
         Map<String, UserData> map = document.getUserDataMap(this);
         UserData previous = data == null
@@ -714,7 +708,7 @@ public abstract class NodeImpl implements Node {
 
     public final Object getUserData(String key) {
         if (key == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("key == null");
         }
         Map<String, UserData> map = document.getUserDataMapForRead(this);
         UserData userData = map.get(key);
