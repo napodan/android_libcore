@@ -15,10 +15,6 @@
  *  limitations under the License.
  */
 
-// BEGIN android-note
-// Completely different implementation from harmony.  Runs much faster.
-// BEGIN android-note
-
 package java.util;
 
 /**
@@ -68,7 +64,6 @@ public class LinkedHashMap<K, V> extends HashMap<K, V> {
      * Constructs a new empty {@code LinkedHashMap} instance.
      */
     public LinkedHashMap() {
-        super();
         init();
         accessOrder = false;
     }
@@ -165,6 +160,15 @@ public class LinkedHashMap<K, V> extends HashMap<K, V> {
     }
 
     /**
+     * Returns the eldest entry in the map, or {@code null} if the map is empty.
+     * @hide
+     */
+    public Entry<K, V> eldest() {
+        LinkedEntry<K, V> eldest = header.nxt;
+        return eldest != header ? eldest : null;
+    }
+
+    /**
      * Evicts eldest entry if instructed, creates a new entry and links it in
      * as head of linked list. This method should call constructorNewEntry
      * (instead of duplicating code) if the performance of your VM permits.
@@ -243,11 +247,8 @@ public class LinkedHashMap<K, V> extends HashMap<K, V> {
             return e.value;
         }
 
-        // Doug Lea's supplemental secondaryHash function (inlined)
-        int hash = key.hashCode();
-        hash ^= (hash >>> 20) ^ (hash >>> 12);
-        hash ^= (hash >>> 7) ^ (hash >>> 4);
-
+        // Replace with Collections.secondaryHash when the VM is fast enough (http://b/8290590).
+        int hash = secondaryHash(key);
         HashMapEntry<K, V>[] tab = table;
         for (HashMapEntry<K, V> e = tab[hash & (tab.length - 1)];
                 e != null; e = e.next) {
