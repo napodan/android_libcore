@@ -22,6 +22,7 @@
 package org.kxml2.io;
 
 import java.io.*;
+import java.util.Locale;
 import org.xmlpull.v1.*;
 
 public class KXmlSerializer implements XmlSerializer {
@@ -91,9 +92,7 @@ public class KXmlSerializer implements XmlSerializer {
         writer.write(close ? " />" : ">");
     }
 
-    private final void writeEscaped(String s, int quot)
-        throws IOException {
-
+    private final void writeEscaped(String s, int quot) throws IOException {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             switch (c) {
@@ -114,14 +113,11 @@ public class KXmlSerializer implements XmlSerializer {
                 case '<' :
                     writer.write("&lt;");
                     break;
-                case '"' :
-                case '\'' :
+                default:
                     if (c == quot) {
-                        writer.write(
-                            c == '"' ? "&quot;" : "&apos;");
+                        writer.write(c == '"' ? "&quot;" : "&apos;");
                         break;
                     }
-                default :
                     // BEGIN android-changed: refuse to output invalid characters
                     // See http://www.w3.org/TR/REC-xml/#charsets for definition.
                     // No other Java XML writer we know of does this, but no Java
@@ -164,9 +160,7 @@ public class KXmlSerializer implements XmlSerializer {
 
     public void endDocument() throws IOException {
         while (depth > 0) {
-            endTag(
-                elementStack[depth * 3 - 3],
-                elementStack[depth * 3 - 1]);
+            endTag(elementStack[depth * 3 - 3], elementStack[depth * 3 - 1]);
         }
         flush();
     }
@@ -333,27 +327,25 @@ public class KXmlSerializer implements XmlSerializer {
     public void setOutput(OutputStream os, String encoding)
         throws IOException {
         if (os == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("os == null");
         setOutput(
             encoding == null
                 ? new OutputStreamWriter(os)
                 : new OutputStreamWriter(os, encoding));
         this.encoding = encoding;
-        if (encoding != null
-            && encoding.toLowerCase().startsWith("utf"))
+        if (encoding != null && encoding.toLowerCase(Locale.US).startsWith("utf")) {
             unicode = true;
+        }
     }
 
-    public void startDocument(
-        String encoding,
-        Boolean standalone)
-        throws IOException {
+    public void startDocument(String encoding, Boolean standalone) throws IOException {
         writer.write("<?xml version='1.0' ");
 
         if (encoding != null) {
             this.encoding = encoding;
-            if (encoding.toLowerCase().startsWith("utf"))
+            if (encoding.toLowerCase(Locale.US).startsWith("utf")) {
                 unicode = true;
+            }
         }
 
         if (this.encoding != null) {
