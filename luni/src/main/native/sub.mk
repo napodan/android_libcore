@@ -62,19 +62,8 @@ LOCAL_C_INCLUDES += \
 	external/openssl/include \
 	external/zlib
 
-# Any shared/static libs that are listed here must also
-# be listed in libs/nativehelper/Android.mk.
-# TODO: fix this requirement
-
 LOCAL_SHARED_LIBRARIES += \
-	libcrypto \
-	libcutils \
-	libexpat \
-	libicuuc \
-	libicui18n \
-	libssl \
-	libutils \
-	libz
+	liblog \
 
 LOCAL_STATIC_LIBRARIES += \
 	libfdlibm
