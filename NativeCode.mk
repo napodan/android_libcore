@@ -101,11 +101,13 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libjavacore
 include $(BUILD_STATIC_LIBRARY)
 
-# Deal with keystores required for security. Note: The path to this file
-# is hardcoded in TrustManagerFactoryImpl.java.
-ALL_PREBUILT += $(TARGET_OUT)/etc/security/cacerts.bks
-$(TARGET_OUT)/etc/security/cacerts.bks : $(LOCAL_PATH)/luni/src/main/files/cacerts.bks | $(ACP)
-	$(transform-prebuilt-to-target)
+include $(CLEAR_VARS)
+LOCAL_MODULE := cacerts.bks
+LOCAL_SRC_FILES := luni/src/main/files/$(LOCAL_MODULE)
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_OUT)/etc/security
+include $(BUILD_PREBUILT)
+
 
 
 #
@@ -113,9 +115,7 @@ $(TARGET_OUT)/etc/security/cacerts.bks : $(LOCAL_PATH)/luni/src/main/files/cacer
 #
 
 ifeq ($(WITH_HOST_DALVIK),true)
-
     include $(CLEAR_VARS)
-
     # Define the rules.
     LOCAL_SRC_FILES := $(core_src_files)
     LOCAL_C_INCLUDES := $(core_c_includes)
