@@ -263,47 +263,8 @@ public final class CharsetEncoderICU extends CharsetEncoder {
         return canEncode((int) c);
     }
 
-    /**
-     * Ascertains if a given Unicode code point (32bit value for handling surrogates)
-     * can be converted to the target encoding. If the caller wants to test if a
-     * surrogate pair can be converted to target encoding then the
-     * responsibility of assembling the int value lies with the caller.
-     * For assembling a code point the caller can use UTF16 class of ICU4J and do something like:
-     * <pre>
-     * while(i<mySource.length){
-     *      if(UTF16.isLeadSurrogate(mySource[i])&& i+1< mySource.length){
-     *          if(UTF16.isTrailSurrogate(mySource[i+1])){
-     *              int temp = UTF16.charAt(mySource,i,i+1,0);
-     *              if(!((CharsetEncoderICU) myConv).canEncode(temp)){
-     *          passed=false;
-     *              }
-     *              i++;
-     *              i++;
-     *          }
-     *     }
-     * }
-     * </pre>
-     * or
-     * <pre>
-     * String src = new String(mySource);
-     * int i,codepoint;
-     * boolean passed = false;
-     * while(i<src.length()){
-     *    codepoint = UTF16.charAt(src,i);
-     *    i+= (codepoint>0xfff)? 2:1;
-     *    if(!(CharsetEncoderICU) myConv).canEncode(codepoint)){
-     *        passed = false;
-     *    }
-     * }
-     * </pre>
-     *
-     * @param codepoint Unicode code point as int value
-     * @return true if a character can be converted
-     * @obsolete ICU 2.4
-     * @deprecated ICU 3.4
-     */
-    public boolean canEncode(int codepoint) {
-        return NativeConverter.canEncode(converterHandle, codepoint);
+    public boolean canEncode(int codePoint) {
+        return NativeConverter.canEncode(converterHandle, codePoint);
     }
 
     /**
