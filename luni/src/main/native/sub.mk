@@ -13,7 +13,6 @@ LOCAL_SRC_FILES := \
 	NativeBreakIterator.cpp \
 	NativeCollation.cpp \
 	NativeConverter.cpp \
-	NativeCrypto.cpp \
 	NativeDecimalFormat.cpp \
 	NativeIDN.cpp \
 	NativeNormalizer.cpp \
@@ -53,6 +52,7 @@ LOCAL_SRC_FILES := \
 	org_apache_harmony_luni_util_FloatingPointParser.cpp \
 	libcore_io_OsConstants.cpp \
 	org_apache_harmony_xml_ExpatParser.cpp \
+	org_apache_harmony_xnet_provider_jsse_NativeCrypto.cpp \
 	valueOf.cpp
 
 LOCAL_C_INCLUDES += \
