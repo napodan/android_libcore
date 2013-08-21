@@ -262,8 +262,8 @@ static JNINativeMethod gMethods[] = {
     { "trampoline", "(Ljava/lang/String;Ljava/lang/String;)I",
         (void*) dalvik_system_TouchDex_trampoline },
 };
-int register_dalvik_system_TouchDex(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, JAVA_PACKAGE "/TouchDex", gMethods, NELEM(gMethods));
+void register_dalvik_system_TouchDex(JNIEnv* env) {
+    jniRegisterNativeMethods(env, JAVA_PACKAGE "/TouchDex", gMethods, NELEM(gMethods));
 }
 
 }; // namespace android

@@ -184,7 +184,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(NativeBidi, ubidi_setLine, "(JII)J"),
     NATIVE_METHOD(NativeBidi, ubidi_setPara, "(J[CII[B)V"),
 };
-int register_org_apache_harmony_text_NativeBidi(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "org/apache/harmony/text/NativeBidi",
-            gMethods, NELEM(gMethods));
+void register_java_text_Bidi(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "org/apache/harmony/text/NativeBidi", gMethods, NELEM(gMethods));
 }

@@ -246,11 +246,11 @@ static pid_t executeProcess(JNIEnv* env, char** commands, char** environment,
         execvp(commands[0], commands);
 
         // If we got here, execvp() failed or the working dir was invalid.
-        execFailed:
-            error = errno;
-            write(statusOut, &error, sizeof(int));
-            close(statusOut);
-            exit(error);
+execFailed:
+        error = errno;
+        write(statusOut, &error, sizeof(int));
+        close(statusOut);
+        exit(error);
     }
 
     // This is the parent process.
@@ -321,8 +321,7 @@ static void freeStrings(JNIEnv* env, jobjectArray javaArray, char** array) {
 /**
  * Converts Java String[] to char** and delegates to executeProcess().
  */
-static pid_t ProcessManager_exec(
-        JNIEnv* env, jclass, jobjectArray javaCommands,
+static pid_t ProcessManager_exec(JNIEnv* env, jclass, jobjectArray javaCommands,
         jobjectArray javaEnvironment, jstring javaWorkingDirectory,
         jobject inDescriptor, jobject outDescriptor, jobject errDescriptor,
         jboolean redirectErrorStream) {
@@ -339,8 +338,7 @@ static pid_t ProcessManager_exec(
     // Convert environment array.
     char** environment = convertStrings(env, javaEnvironment);
 
-    pid_t result = executeProcess(
-            env, commands, environment, workingDirectory,
+    pid_t result = executeProcess(env, commands, environment, workingDirectory,
             inDescriptor, outDescriptor, errDescriptor, redirectErrorStream);
 
     // Temporarily clear exception so we can clean up.
@@ -390,6 +388,6 @@ static JNINativeMethod methods[] = {
     NATIVE_METHOD(ProcessManager, watchChildren, "()V"),
     NATIVE_METHOD(ProcessManager, exec, "([Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Ljava/io/FileDescriptor;Ljava/io/FileDescriptor;Ljava/io/FileDescriptor;Z)I"),
 };
-int register_java_lang_ProcessManager(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "java/lang/ProcessManager", methods, NELEM(methods));
+void register_java_lang_ProcessManager(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "java/lang/ProcessManager", methods, NELEM(methods));
 }

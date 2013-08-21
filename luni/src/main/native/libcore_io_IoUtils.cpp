@@ -70,6 +70,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(IoUtils, setFd, "(Ljava/io/FileDescriptor;I)V"),
     NATIVE_METHOD(IoUtils, setBlocking, "(Ljava/io/FileDescriptor;Z)V"),
 };
-int register_libcore_io_IoUtils(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "libcore/io/IoUtils", gMethods, NELEM(gMethods));
+void register_libcore_io_IoUtils(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "libcore/io/IoUtils", gMethods, NELEM(gMethods));
 }

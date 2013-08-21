@@ -44,6 +44,6 @@ static void FileDescriptor_syncImpl(JNIEnv* env, jobject obj) {
 static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(FileDescriptor, syncImpl, "()V"),
 };
-int register_java_io_FileDescriptor(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "java/io/FileDescriptor", gMethods, NELEM(gMethods));
+void register_java_io_FileDescriptor(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "java/io/FileDescriptor", gMethods, NELEM(gMethods));
 }

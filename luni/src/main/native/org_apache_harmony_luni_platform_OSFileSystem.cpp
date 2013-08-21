@@ -503,7 +503,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(OSFileSystem, writeDirect, "(IIII)J"),
     NATIVE_METHOD(OSFileSystem, writev, "(I[I[I[II)J"),
 };
-int register_org_apache_harmony_luni_platform_OSFileSystem(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "org/apache/harmony/luni/platform/OSFileSystem", gMethods,
-            NELEM(gMethods));
+void register_org_apache_harmony_luni_platform_OSFileSystem(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "org/apache/harmony/luni/platform/OSFileSystem", gMethods, NELEM(gMethods));
 }

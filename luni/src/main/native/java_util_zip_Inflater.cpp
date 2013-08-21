@@ -171,9 +171,9 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(Inflater, setFileInputImpl, "(Ljava/io/FileDescriptor;JIJ)I"),
     NATIVE_METHOD(Inflater, setInputImpl, "([BIIJ)V"),
 };
-int register_java_util_zip_Inflater(JNIEnv* env) {
+void register_java_util_zip_Inflater(JNIEnv* env) {
     gCachedFields.finished = env->GetFieldID(JniConstants::inflaterClass, "finished", "Z");
     gCachedFields.inRead = env->GetFieldID(JniConstants::inflaterClass, "inRead", "I");
     gCachedFields.needsDictionary = env->GetFieldID(JniConstants::inflaterClass, "needsDictionary", "Z");
-    return jniRegisterNativeMethods(env, "java/util/zip/Inflater", gMethods, NELEM(gMethods));
+    jniRegisterNativeMethods(env, "java/util/zip/Inflater", gMethods, NELEM(gMethods));
 }

@@ -686,7 +686,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(NativeConverter, setCallbackDecode, "(JII[C)I"),
     NATIVE_METHOD(NativeConverter, setCallbackEncode, "(JII[B)I"),
 };
-int register_com_ibm_icu4jni_converters_NativeConverter(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "com/ibm/icu4jni/charset/NativeConverter",
-                gMethods, NELEM(gMethods));
+void register_libcore_icu_NativeConverter(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "com/ibm/icu4jni/charset/NativeConverter", gMethods, NELEM(gMethods));
 }

@@ -359,7 +359,7 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(OSMemory, setShortArray, "(I[SIIZ)V"),
     NATIVE_METHOD(OSMemory, unmap, "(IJ)V"),
 };
-int register_org_apache_harmony_luni_platform_OSMemory(JNIEnv* env) {
+void register_org_apache_harmony_luni_platform_OSMemory(JNIEnv* env) {
     /*
      * We need to call VMRuntime.trackExternal{Allocation,Free}.  Cache
      * method IDs and a reference to the singleton.
@@ -377,16 +377,15 @@ int register_org_apache_harmony_luni_platform_OSMemory(JNIEnv* env) {
         method_getRuntime == NULL)
     {
         ALOGE("Unable to find VMRuntime methods\n");
-        return -1;
+        return ;
     }
 
     jobject instance = env->CallStaticObjectMethod(JniConstants::vmRuntimeClass, method_getRuntime);
     if (instance == NULL) {
         ALOGE("Unable to obtain VMRuntime instance\n");
-        return -1;
+        return ;
     }
     gIDCache.runtimeInstance = env->NewGlobalRef(instance);
 
-    return jniRegisterNativeMethods(env, "org/apache/harmony/luni/platform/OSMemory",
-            gMethods, NELEM(gMethods));
+    jniRegisterNativeMethods(env, "org/apache/harmony/luni/platform/OSMemory", gMethods, NELEM(gMethods));
 }

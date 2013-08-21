@@ -58,6 +58,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(System, getEnvByName, "(Ljava/lang/String;)Ljava/lang/String;"),
     NATIVE_METHOD(System, setFieldImpl, "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V"),
 };
-int register_java_lang_System(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "java/lang/System", gMethods, NELEM(gMethods));
+void register_java_lang_System(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "java/lang/System", gMethods, NELEM(gMethods));
 }

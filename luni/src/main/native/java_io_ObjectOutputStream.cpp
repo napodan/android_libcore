@@ -75,6 +75,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(ObjectOutputStream, getFieldObj, "(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;"),
     NATIVE_METHOD(ObjectOutputStream, getFieldShort, "(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;)S"),
 };
-int register_java_io_ObjectOutputStream(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "java/io/ObjectOutputStream", gMethods, NELEM(gMethods));
+void register_java_io_ObjectOutputStream(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "java/io/ObjectOutputStream", gMethods, NELEM(gMethods));
 }

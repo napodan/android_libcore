@@ -14,111 +14,122 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "libcore" // We'll be next to "dalvikvm" in the log; make the distinction clear.
+
 #include "JniConstants.h"
 #include "ScopedLocalFrame.h"
 
+#include <stdlib.h>
 namespace android {
-    extern int register_dalvik_system_TouchDex(JNIEnv* env);
+    extern void register_dalvik_system_TouchDex(JNIEnv* env);
 }
 
-extern int register_com_ibm_icu4jni_converters_NativeConverter(JNIEnv* env);
-extern int register_libcore_icu_NativeBreakIterator(JNIEnv* env);
-extern int register_com_ibm_icu4jni_text_NativeCollator(JNIEnv* env);
-extern int register_libcore_icu_NativeDecimalFormat(JNIEnv* env);
-extern int register_libcore_icu_ICU(JNIEnv* env);
-extern int register_java_io_Console(JNIEnv* env);
-extern int register_java_io_File(JNIEnv* env);
-extern int register_java_io_FileDescriptor(JNIEnv* env);
-extern int register_java_io_ObjectInputStream(JNIEnv* env);
-extern int register_java_io_ObjectOutputStream(JNIEnv* env);
-extern int register_java_io_ObjectStreamClass(JNIEnv* env);
-extern int register_java_lang_Character(JNIEnv* env);
-extern int register_java_lang_Double(JNIEnv* env);
-extern int register_java_lang_Float(JNIEnv* env);
-extern int register_java_lang_Math(JNIEnv* env);
-extern int register_java_lang_ProcessManager(JNIEnv* env);
-extern int register_java_lang_RealToString(JNIEnv* env);
-extern int register_java_lang_StrictMath(JNIEnv* env);
-extern int register_java_lang_System(JNIEnv* env);
-extern int register_java_math_NativeBN(JNIEnv* env);
-extern int register_java_net_InetAddress(JNIEnv* env);
-extern int register_java_net_NetworkInterface(JNIEnv* env);
-extern int register_java_nio_ByteOrder(JNIEnv* env);
-extern int register_java_nio_charset_Charsets(JNIEnv* env);
-extern int register_java_util_regex_Matcher(JNIEnv* env);
-extern int register_java_util_regex_Pattern(JNIEnv* env);
-extern int register_java_util_zip_Adler32(JNIEnv* env);
-extern int register_java_util_zip_CRC32(JNIEnv* env);
-extern int register_java_util_zip_Deflater(JNIEnv* env);
-extern int register_java_util_zip_Inflater(JNIEnv* env);
-extern int register_libcore_icu_NativeIDN(JNIEnv* env);
-extern int register_libcore_icu_NativeNormalizer(JNIEnv* env);
-extern int register_libcore_icu_NativePluralRules(JNIEnv* env);
-extern int register_libcore_icu_TimeZones(JNIEnv* env);
-extern int register_libcore_io_IoUtils(JNIEnv* env);
-extern int register_libcore_io_OsConstants(JNIEnv* env);
-extern int register_org_apache_harmony_dalvik_NativeTestTarget(JNIEnv* env);
-extern int register_org_apache_harmony_luni_platform_OSFileSystem(JNIEnv* env);
-extern int register_org_apache_harmony_luni_platform_OSMemory(JNIEnv* env);
-extern int register_org_apache_harmony_luni_platform_OSNetworkSystem(JNIEnv* env);
-extern int register_org_apache_harmony_luni_util_fltparse(JNIEnv* env);
-extern int register_org_apache_harmony_text_NativeBidi(JNIEnv* env);
-extern int register_org_apache_harmony_xml_ExpatParser(JNIEnv* env);
-extern int register_org_apache_harmony_xnet_provider_jsse_NativeCrypto(JNIEnv* env);
+#define REGISTER_bis(FN) 
+REGISTER_bis(register_libcore_icu_NativeConverter);
+REGISTER_bis(register_libcore_icu_NativeBreakIterator);
+REGISTER_bis(register_libcore_icu_NativeCollation);
+REGISTER_bis(register_libcore_icu_NativeDecimalFormat);
+REGISTER_bis(register_libcore_icu_ICU);
+REGISTER_bis(register_java_io_Console);
+REGISTER_bis(register_java_io_File);
+REGISTER_bis(register_java_io_FileDescriptor);
+REGISTER_bis(register_java_io_ObjectInputStream);
+REGISTER_bis(register_java_io_ObjectOutputStream);
+REGISTER_bis(register_java_io_ObjectStreamClass);
+REGISTER_bis(register_java_lang_Character);
+REGISTER_bis(register_java_lang_Double);
+REGISTER_bis(register_java_lang_Float);
+REGISTER_bis(register_java_lang_Math);
+REGISTER_bis(register_java_lang_ProcessManager);
+REGISTER_bis(register_java_lang_RealToString);
+REGISTER_bis(register_java_lang_StrictMath);
+REGISTER_bis(register_java_lang_System);
+REGISTER_bis(register_java_math_NativeBN);
+REGISTER_bis(register_java_net_InetAddress);
+REGISTER_bis(register_java_net_NetworkInterface);
+REGISTER_bis(register_java_nio_ByteOrder);
+REGISTER_bis(register_java_nio_charset_Charsets);
+REGISTER_bis(register_java_util_regex_Matcher);
+REGISTER_bis(register_java_util_regex_Pattern);
+REGISTER_bis(register_java_util_zip_Adler32);
+REGISTER_bis(register_java_util_zip_CRC32);
+REGISTER_bis(register_java_util_zip_Deflater);
+REGISTER_bis(register_java_util_zip_Inflater);
+REGISTER_bis(register_libcore_icu_NativeIDN);
+REGISTER_bis(register_libcore_icu_NativeNormalizer);
+REGISTER_bis(register_libcore_icu_NativePluralRules);
+REGISTER_bis(register_libcore_icu_TimeZones);
+REGISTER_bis(register_libcore_io_IoUtils);
+REGISTER_bis(register_libcore_io_OsConstants);
+REGISTER_bis(register_org_apache_harmony_luni_platform_OSFileSystem);
+REGISTER_bis(register_org_apache_harmony_luni_platform_OSMemory);
+REGISTER_bis(register_org_apache_harmony_luni_platform_OSNetworkSystem);
+REGISTER_bis(register_org_apache_harmony_luni_util_fltparse);
+REGISTER_bis(register_java_text_Bidi);
+REGISTER_bis(register_org_apache_harmony_xnet_provider_jsse_NativeCrypto);
+REGISTER_bis(register_org_apache_harmony_dalvik_NativeTestTarget);
+REGISTER_bis(register_org_apache_harmony_xml_ExpatParser);
 
 // DalvikVM calls this on startup, so we can statically register all our native methods.
-extern "C" int registerCoreLibrariesJni(JNIEnv* env) {
+int JNI_OnLoad(JavaVM* vm, void*) {
+    JNIEnv* env;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        ALOGE("JavaVM::GetEnv() failed");
+        abort();
+    }
+
     ScopedLocalFrame localFrame(env);
 
     JniConstants::init(env);
 
-    bool result =
-            register_com_ibm_icu4jni_converters_NativeConverter(env) != -1 &&
-            register_libcore_icu_NativeBreakIterator(env) != -1 &&
-            register_com_ibm_icu4jni_text_NativeCollator(env) != -1 &&
-            register_libcore_icu_NativeDecimalFormat(env) != -1 &&
-            register_libcore_icu_ICU(env) != -1 &&
-            register_java_io_Console(env) != -1 &&
-            register_java_io_File(env) != -1 &&
-            register_java_io_FileDescriptor(env) != -1 &&
-            register_java_io_ObjectInputStream(env) != -1 &&
-            register_java_io_ObjectOutputStream(env) != -1 &&
-            register_java_io_ObjectStreamClass(env) != -1 &&
-            register_java_lang_Character(env) != -1 &&
-            register_java_lang_Double(env) != -1 &&
-            register_java_lang_Float(env) != -1 &&
-            register_java_lang_Math(env) != -1 &&
-            register_java_lang_ProcessManager(env) != -1 &&
-            register_java_lang_RealToString(env) != -1 &&
-            register_java_lang_StrictMath(env) != -1 &&
-            register_java_lang_System(env) != -1 &&
-            register_java_math_NativeBN(env) != -1 &&
-            register_java_net_InetAddress(env) != -1 &&
-            register_java_net_NetworkInterface(env) != -1 &&
-            register_java_nio_ByteOrder(env) != -1 &&
-            register_java_nio_charset_Charsets(env) != -1 &&
-            register_java_util_regex_Matcher(env) != -1 &&
-            register_java_util_regex_Pattern(env) != -1 &&
-            register_java_util_zip_Adler32(env) != -1 &&
-            register_java_util_zip_CRC32(env) != -1 &&
-            register_java_util_zip_Deflater(env) != -1 &&
-            register_java_util_zip_Inflater(env) != -1 &&
-            register_libcore_icu_NativeIDN(env) != -1 &&
-            register_libcore_icu_NativeNormalizer(env) != -1 &&
-            register_libcore_icu_NativePluralRules(env) != -1 &&
-            register_libcore_icu_TimeZones(env) != -1 &&
-            register_libcore_io_IoUtils(env) != -1 &&
-            register_libcore_io_OsConstants(env) != -1 &&
-            register_org_apache_harmony_luni_platform_OSFileSystem(env) != -1 &&
-            register_org_apache_harmony_luni_platform_OSMemory(env) != -1 &&
-            register_org_apache_harmony_luni_platform_OSNetworkSystem(env) != -1 &&
-            register_org_apache_harmony_luni_util_fltparse(env) != -1 &&
-            register_org_apache_harmony_text_NativeBidi(env) != -1 &&
-            register_org_apache_harmony_xnet_provider_jsse_NativeCrypto(env) != -1 &&
+#define REGISTER(FN) extern void FN(JNIEnv*); FN(env)
+    REGISTER(register_java_io_Console);
+    REGISTER(register_java_io_File);
+    REGISTER(register_java_io_FileDescriptor);
+    REGISTER(register_java_io_ObjectInputStream);
+    REGISTER(register_java_io_ObjectOutputStream);
+    REGISTER(register_java_io_ObjectStreamClass);
+    REGISTER(register_java_lang_Character);
+    REGISTER(register_java_lang_Double);
+    REGISTER(register_java_lang_Float);
+    REGISTER(register_java_lang_Math);
+    REGISTER(register_java_lang_ProcessManager);
+    REGISTER(register_java_lang_RealToString);
+    REGISTER(register_java_lang_StrictMath);
+    REGISTER(register_java_lang_System);
+    REGISTER(register_java_math_NativeBN);
+    REGISTER(register_java_net_InetAddress);
+    REGISTER(register_java_net_NetworkInterface);
+    REGISTER(register_java_nio_ByteOrder);
+    REGISTER(register_java_nio_charset_Charsets);
+    REGISTER(register_java_text_Bidi);
+    REGISTER(register_java_util_regex_Matcher);
+    REGISTER(register_java_util_regex_Pattern);
+    REGISTER(register_java_util_zip_Adler32);
+    REGISTER(register_java_util_zip_CRC32);
+    REGISTER(register_java_util_zip_Deflater);
+    REGISTER(register_java_util_zip_Inflater);
+    REGISTER(register_libcore_icu_ICU);
+    REGISTER(register_libcore_icu_NativeBreakIterator);
+    REGISTER(register_libcore_icu_NativeCollation);
+    REGISTER(register_libcore_icu_NativeConverter);
+    REGISTER(register_libcore_icu_NativeDecimalFormat);
+    REGISTER(register_libcore_icu_NativeIDN);
+    REGISTER(register_libcore_icu_NativeNormalizer);
+    REGISTER(register_libcore_icu_NativePluralRules);
+    REGISTER(register_libcore_icu_TimeZones);
+    REGISTER(register_libcore_io_IoUtils);
+    REGISTER(register_libcore_io_OsConstants);
+    REGISTER(register_org_apache_harmony_luni_platform_OSFileSystem);
+    REGISTER(register_org_apache_harmony_luni_platform_OSMemory);
+    REGISTER(register_org_apache_harmony_luni_platform_OSNetworkSystem);
+    REGISTER(register_org_apache_harmony_luni_util_fltparse);
+    REGISTER(register_org_apache_harmony_dalvik_NativeTestTarget);
+    REGISTER(register_org_apache_harmony_xml_ExpatParser);
+    REGISTER(register_org_apache_harmony_xnet_provider_jsse_NativeCrypto);
+#undef REGISTER
             // Initialize the Android classes last, as they have dependencies on the "corer" core classes.
-            android::register_dalvik_system_TouchDex(env) != -1 &&
-            register_org_apache_harmony_dalvik_NativeTestTarget(env) != -1 &&
-            register_org_apache_harmony_xml_ExpatParser(env) != -1;
+    android::register_dalvik_system_TouchDex(env);
 
-    return result ? 0 : -1;
+    return JNI_VERSION_1_6;
 }

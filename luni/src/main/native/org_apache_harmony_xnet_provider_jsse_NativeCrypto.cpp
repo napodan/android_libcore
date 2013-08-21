@@ -3384,11 +3384,8 @@ static JNINativeMethod sNativeCryptoMethods[] = {
     NATIVE_METHOD(NativeCrypto, d2i_SSL_SESSION, "([B)I"),
 };
 
-int register_org_apache_harmony_xnet_provider_jsse_NativeCrypto(JNIEnv* env) {
+void register_org_apache_harmony_xnet_provider_jsse_NativeCrypto(JNIEnv* env) {
     JNI_TRACE("register_org_apache_harmony_xnet_provider_jsse_NativeCrypto");
-    // Register org.apache.harmony.xnet.provider.jsse.NativeCrypto methods
-    return jniRegisterNativeMethods(env,
-                                    "org/apache/harmony/xnet/provider/jsse/NativeCrypto",
-                                    sNativeCryptoMethods,
-                                    NELEM(sNativeCryptoMethods));
+    jniRegisterNativeMethods(env, "org/apache/harmony/xnet/provider/jsse/NativeCrypto",
+                             sNativeCryptoMethods, NELEM(sNativeCryptoMethods));
 }

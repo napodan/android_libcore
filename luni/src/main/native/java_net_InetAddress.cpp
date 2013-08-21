@@ -332,6 +332,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(InetAddress, getnameinfo, "([B)Ljava/lang/String;"),
     NATIVE_METHOD(InetAddress, ipStringToByteArray, "(Ljava/lang/String;)[B"),
 };
-int register_java_net_InetAddress(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "java/net/InetAddress", gMethods, NELEM(gMethods));
+void register_java_net_InetAddress(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "java/net/InetAddress", gMethods, NELEM(gMethods));
 }

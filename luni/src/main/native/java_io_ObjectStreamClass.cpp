@@ -53,6 +53,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(ObjectStreamClass, getMethodSignature, "(Ljava/lang/reflect/Method;)Ljava/lang/String;"),
     NATIVE_METHOD(ObjectStreamClass, hasClinit, "(Ljava/lang/Class;)Z"),
 };
-int register_java_io_ObjectStreamClass(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "java/io/ObjectStreamClass", gMethods, NELEM(gMethods));
+void register_java_io_ObjectStreamClass(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "java/io/ObjectStreamClass", gMethods, NELEM(gMethods));
 }

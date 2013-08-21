@@ -197,10 +197,9 @@ static jboolean NativeBN_litEndInts2bn(JNIEnv* env, jclass, jintArray arr, int l
   | (bytes[k + 0] & 0xFF) << 24 )
 
 static jboolean negBigEndianBytes2bn(JNIEnv*, jclass, const unsigned char* bytes, int bytesLen, BIGNUM* ret) {
-// We rely on: (BN_BITS2 == 32), i.e. BN_ULONG is unsigned int and has 4 bytes:
-//
+    // We rely on: (BN_BITS2 == 32), i.e. BN_ULONG is unsigned int and has 4 bytes:
     bn_check_top(ret);
-// FIXME: ASSERT (bytesLen > 0);
+    // FIXME: assert bytesLen > 0
     int intLen = (bytesLen + 3) / 4;
     int firstNonzeroDigit = -2;
     if (bn_wexpand(ret, intLen) != NULL) {
@@ -554,6 +553,6 @@ static JNINativeMethod gMethods[] = {
    NATIVE_METHOD(NativeBN, sign, "(I)I"),
    NATIVE_METHOD(NativeBN, twosComp2bn, "([BII)Z"),
 };
-int register_java_math_NativeBN(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "java/math/NativeBN", gMethods, NELEM(gMethods));
+void register_java_math_NativeBN(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "java/math/NativeBN", gMethods, NELEM(gMethods));
 }

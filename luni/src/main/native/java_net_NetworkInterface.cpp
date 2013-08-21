@@ -225,6 +225,6 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(NetworkInterface, isUpImpl, "(Ljava/lang/String;)Z"),
     NATIVE_METHOD(NetworkInterface, supportsMulticastImpl, "(Ljava/lang/String;)Z"),
 };
-int register_java_net_NetworkInterface(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "java/net/NetworkInterface", gMethods, NELEM(gMethods));
+void register_java_net_NetworkInterface(JNIEnv* env) {
+    jniRegisterNativeMethods(env, "java/net/NetworkInterface", gMethods, NELEM(gMethods));
 }

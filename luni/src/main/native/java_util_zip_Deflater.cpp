@@ -143,8 +143,8 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(Deflater, setInputImpl, "([BIIJ)V"),
     NATIVE_METHOD(Deflater, setLevelsImpl, "(IIJ)V"),
 };
-int register_java_util_zip_Deflater(JNIEnv* env) {
+void register_java_util_zip_Deflater(JNIEnv* env) {
     gCachedFields.finished = env->GetFieldID(JniConstants::deflaterClass, "finished", "Z");
     gCachedFields.inRead = env->GetFieldID(JniConstants::deflaterClass, "inRead", "I");
-    return jniRegisterNativeMethods(env, "java/util/zip/Deflater", gMethods, NELEM(gMethods));
+    jniRegisterNativeMethods(env, "java/util/zip/Deflater", gMethods, NELEM(gMethods));
 }

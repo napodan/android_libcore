@@ -56,13 +56,5 @@ static JNINativeMethod gMethods[] = {
   { "emptyJniStaticMethod6L", "(Ljava/lang/String;[Ljava/lang/String;[[ILjava/lang/Object;[Ljava/lang/Object;[[[[Ljava/lang/Object;)V", (void*)emptyJniStaticMethod6L },
 };
 int register_org_apache_harmony_dalvik_NativeTestTarget(JNIEnv* env) {
-    int result = jniRegisterNativeMethods(env,
-            "org/apache/harmony/dalvik/NativeTestTarget",
-            gMethods, NELEM(gMethods));
-    if (result != 0) {
-        /* print warning, but allow to continue */
-        ALOGW("WARNING: NativeTestTarget not registered\n");
-        env->ExceptionClear();
-    }
-    return 0;
+    return jniRegisterNativeMethods(env, "org/apache/harmony/dalvik/NativeTestTarget", gMethods, NELEM(gMethods));
 }

@@ -1366,8 +1366,7 @@ static JNINativeMethod gMethods[] = {
     NATIVE_METHOD(OSNetworkSystem, writeDirect, "(Ljava/io/FileDescriptor;III)I"),
 };
 
-int register_org_apache_harmony_luni_platform_OSNetworkSystem(JNIEnv* env) {
+void register_org_apache_harmony_luni_platform_OSNetworkSystem(JNIEnv* env) {
     AsynchronousSocketCloseMonitor::init();
-    return initCachedFields(env) && jniRegisterNativeMethods(env,
-            "org/apache/harmony/luni/platform/OSNetworkSystem", gMethods, NELEM(gMethods));
+    initCachedFields(env) && jniRegisterNativeMethods(env, "org/apache/harmony/luni/platform/OSNetworkSystem", gMethods, NELEM(gMethods));
 }

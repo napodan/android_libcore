@@ -42,9 +42,9 @@ static jboolean NativeNormalizer_isNormalizedImpl(JNIEnv* env, jclass, jstring s
 }
 
 static JNINativeMethod gMethods[] = {
-    NATIVE_METHOD(NativeNormalizer, normalizeImpl, "(Ljava/lang/String;I)Ljava/lang/String;"),
-    NATIVE_METHOD(NativeNormalizer, isNormalizedImpl, "(Ljava/lang/String;I)Z"),
+  NATIVE_METHOD(NativeNormalizer, normalizeImpl, "(Ljava/lang/String;I)Ljava/lang/String;"),
+  NATIVE_METHOD(NativeNormalizer, isNormalizedImpl, "(Ljava/lang/String;I)Z"),
 };
-int register_libcore_icu_NativeNormalizer(JNIEnv* env) {
-    return jniRegisterNativeMethods(env, "libcore/icu/NativeNormalizer", gMethods, NELEM(gMethods));
+void register_libcore_icu_NativeNormalizer(JNIEnv* env) {
+  jniRegisterNativeMethods(env, "libcore/icu/NativeNormalizer", gMethods, NELEM(gMethods));
 }
