@@ -123,21 +123,21 @@ static jint NativeBreakIterator_lastImpl(JNIEnv*, jclass, jint address) {
 }
 
 static JNINativeMethod gMethods[] = {
-    NATIVE_METHOD(NativeBreakIterator, cloneImpl, "(I)I"),
-    NATIVE_METHOD(NativeBreakIterator, closeBreakIteratorImpl, "(I)V"),
-    NATIVE_METHOD(NativeBreakIterator, currentImpl, "(I)I"),
-    NATIVE_METHOD(NativeBreakIterator, firstImpl, "(I)I"),
-    NATIVE_METHOD(NativeBreakIterator, followingImpl, "(II)I"),
-    NATIVE_METHOD(NativeBreakIterator, getCharacterInstanceImpl, "(Ljava/lang/String;)I"),
-    NATIVE_METHOD(NativeBreakIterator, getLineInstanceImpl, "(Ljava/lang/String;)I"),
-    NATIVE_METHOD(NativeBreakIterator, getSentenceInstanceImpl, "(Ljava/lang/String;)I"),
-    NATIVE_METHOD(NativeBreakIterator, getWordInstanceImpl, "(Ljava/lang/String;)I"),
-    NATIVE_METHOD(NativeBreakIterator, isBoundaryImpl, "(II)Z"),
-    NATIVE_METHOD(NativeBreakIterator, lastImpl, "(I)I"),
-    NATIVE_METHOD(NativeBreakIterator, nextImpl, "(II)I"),
-    NATIVE_METHOD(NativeBreakIterator, precedingImpl, "(II)I"),
-    NATIVE_METHOD(NativeBreakIterator, previousImpl, "(I)I"),
-    NATIVE_METHOD(NativeBreakIterator, setTextImpl, "(ILjava/lang/String;)V"),
+  NATIVE_METHOD(NativeBreakIterator, cloneImpl, "(I)I"),
+  NATIVE_METHOD(NativeBreakIterator, closeBreakIteratorImpl, "(I)V"),
+  NATIVE_METHOD(NativeBreakIterator, currentImpl, "(I)I"),
+  NATIVE_METHOD(NativeBreakIterator, firstImpl, "(I)I"),
+  NATIVE_METHOD(NativeBreakIterator, followingImpl, "(II)I"),
+  NATIVE_METHOD(NativeBreakIterator, getCharacterInstanceImpl, "(Ljava/lang/String;)I"),
+  NATIVE_METHOD(NativeBreakIterator, getLineInstanceImpl, "(Ljava/lang/String;)I"),
+  NATIVE_METHOD(NativeBreakIterator, getSentenceInstanceImpl, "(Ljava/lang/String;)I"),
+  NATIVE_METHOD(NativeBreakIterator, getWordInstanceImpl, "(Ljava/lang/String;)I"),
+  NATIVE_METHOD(NativeBreakIterator, isBoundaryImpl, "(II)Z"),
+  NATIVE_METHOD(NativeBreakIterator, lastImpl, "(I)I"),
+  NATIVE_METHOD(NativeBreakIterator, nextImpl, "(II)I"),
+  NATIVE_METHOD(NativeBreakIterator, precedingImpl, "(II)I"),
+  NATIVE_METHOD(NativeBreakIterator, previousImpl, "(I)I"),
+  NATIVE_METHOD(NativeBreakIterator, setTextImpl, "(ILjava/lang/String;)V"),
 };
 void register_libcore_icu_NativeBreakIterator(JNIEnv* env) {
   jniRegisterNativeMethods(env, "libcore/icu/NativeBreakIterator", gMethods, NELEM(gMethods));

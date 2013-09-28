@@ -7,7 +7,7 @@
 ******************************************************************************
 */
 
-package com.ibm.icu4jni.common;
+package libcore.icu;
 
 /**
 * Error exception class mapping ICU error codes of the enum UErrorCode

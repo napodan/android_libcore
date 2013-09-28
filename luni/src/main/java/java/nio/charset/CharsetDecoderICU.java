@@ -12,9 +12,8 @@
   *
   * @author Ram Viswanadha, IBM
   */
-package com.ibm.icu4jni.charset;
+package libcore.icu;
 
-import com.ibm.icu4jni.common.ErrorCode;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;

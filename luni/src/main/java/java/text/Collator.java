@@ -17,9 +17,9 @@
 
 package java.text;
 
-import libcore.icu.ICU;
 import java.util.Comparator;
 import java.util.Locale;
+import libcore.icu.ICU;
 
 /**
  * Performs locale-sensitive string comparison. A concrete subclass,

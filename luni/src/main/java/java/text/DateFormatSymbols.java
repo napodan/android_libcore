@@ -17,14 +17,14 @@
 
 package java.text;
 
-import libcore.icu.ICU;
-import libcore.icu.LocaleData;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
+import libcore.icu.ICU;
+import libcore.icu.LocaleData;
 import libcore.icu.TimeZones;
 
 /**

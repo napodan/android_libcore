@@ -16,7 +16,6 @@
 
 package libcore.icu;
 
-import libcore.icu.LocaleData;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -29,6 +28,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.Currency;
 import java.util.NoSuchElementException;
+import libcore.icu.LocaleData;
 
 public final class NativeDecimalFormat {
     /**

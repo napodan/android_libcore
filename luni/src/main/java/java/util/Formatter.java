@@ -30,10 +30,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.nio.charset.Charset;
-import libcore.icu.LocaleData;
-import libcore.icu.NativeDecimalFormat;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import libcore.icu.LocaleData;
+import libcore.icu.NativeDecimalFormat;
 import libcore.io.IoUtils;
 
 /**

@@ -7,10 +7,9 @@
 *******************************************************************************
 */
 
-package com.ibm.icu4jni.text;
+package libcore.icu;
 
 import java.text.CharacterIterator;
-
 
 /**
 * Collation element iterator JNI wrapper.
@@ -37,8 +36,7 @@ import java.text.CharacterIterator;
 * @author syn wee quek
 * @stable ICU 2.4
 */
-
-public final class CollationElementIterator {
+public final class CollationElementIteratorICU {
     // public data member -------------------------------------------
 
     /**
@@ -54,7 +52,7 @@ public final class CollationElementIterator {
      * @stable ICU 2.4
      */
     public void reset() {
-        NativeCollation.reset(m_collelemiterator_);
+        NativeCollation.reset(address);
     }
 
     /**
@@ -65,7 +63,7 @@ public final class CollationElementIterator {
      * @stable ICU 2.4
      */
     public int next() {
-        return NativeCollation.next(m_collelemiterator_);
+        return NativeCollation.next(address);
     }
 
     /**
@@ -76,7 +74,7 @@ public final class CollationElementIterator {
      * @stable ICU 2.4
      */
     public int previous() {
-        return NativeCollation.previous(m_collelemiterator_);
+        return NativeCollation.previous(address);
     }
 
     /**
@@ -89,7 +87,7 @@ public final class CollationElementIterator {
      * @stable ICU 2.4
      */
     public int getMaxExpansion(int order) {
-        return NativeCollation.getMaxExpansion(m_collelemiterator_, order);
+        return NativeCollation.getMaxExpansion(address, order);
     }
 
     /**
@@ -98,14 +96,12 @@ public final class CollationElementIterator {
      * @stable ICU 2.4
      */
     public void setText(String source) {
-        NativeCollation.setText(m_collelemiterator_, source);
+        NativeCollation.setText(address, source);
     }
 
-    // BEGIN android-added
     public void setText(CharacterIterator source) {
-        NativeCollation.setText(m_collelemiterator_, source.toString());
+        NativeCollation.setText(address, source.toString());
     }
-    // END android-added
 
     /**
      * Get the offset of the current source character.
@@ -115,7 +111,7 @@ public final class CollationElementIterator {
      * @stable ICU 2.4
      */
     public int getOffset() {
-        return NativeCollation.getOffset(m_collelemiterator_);
+        return NativeCollation.getOffset(address);
     }
 
     /**
@@ -125,7 +121,7 @@ public final class CollationElementIterator {
      * @stable ICU 2.4
      */
     public void setOffset(int offset) {
-        NativeCollation.setOffset(m_collelemiterator_, offset);
+        NativeCollation.setOffset(address, offset);
     }
 
     /**
@@ -159,16 +155,13 @@ public final class CollationElementIterator {
         return order & TERTIARY_ORDER_MASK_;
     }
 
-    // protected constructor ----------------------------------------
+    public static CollationElementIteratorICU getInstance(int collatorAddress, String source) {
+        int iteratorAddress = NativeCollation.getCollationElementIterator(collatorAddress, source);
+        return new CollationElementIteratorICU(iteratorAddress);
+    }
 
-    /**
-     * CollationElementIteratorJNI constructor.
-     * The only caller of this class should be
-     * RuleBasedCollator.getCollationElementIterator().
-     * @param collelemiteratoraddress address of C collationelementiterator
-     */
-    CollationElementIterator(int collelemiteratoraddress) {
-        m_collelemiterator_ = collelemiteratoraddress;
+    private CollationElementIteratorICU(int address) {
+        this.address = address;
     }
 
     // protected methods --------------------------------------------
@@ -180,7 +173,7 @@ public final class CollationElementIterator {
      */
     @Override protected void finalize() throws Throwable {
         try {
-            NativeCollation.closeElements(m_collelemiterator_);
+            NativeCollation.closeElements(address);
         } finally {
             super.finalize();
         }
@@ -191,7 +184,7 @@ public final class CollationElementIterator {
     /**
      * C collator
      */
-    private int m_collelemiterator_;
+    private int address;
 
     /**
      * ICU constant primary order mask for collation elements
