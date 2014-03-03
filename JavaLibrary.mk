@@ -80,6 +80,7 @@ LOCAL_NO_EMMA_COMPILE := true
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := core
 
+LOCAL_REQUIRED_MODULES := zoneinfo.dat zoneinfo.idx zoneinfo.version
 include $(BUILD_JAVA_LIBRARY)
 
 core-intermediates := ${intermediates}
